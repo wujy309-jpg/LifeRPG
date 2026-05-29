@@ -11,7 +11,8 @@ from datetime import datetime, date
 from database import (
     init_db, create_character, get_character, update_character,
     add_activity_log, get_activity_logs, add_equipment, get_equipment,
-    add_title, get_titles, add_quest, get_quests, complete_quest
+    add_title, get_titles, add_quest, get_quests, complete_quest, get_db,
+    get_all_characters, get_character_count, delete_character
 )
 from game_engine import (
     classify_activity, calculate_exp_gain, calculate_gold_gain,
@@ -61,10 +62,34 @@ if os.path.exists(frontend_path):
 
 # ============ 角色 API ============
 
+@app.get("/api/characters")
+async def api_get_all_characters():
+    """获取所有角色列表"""
+    characters = get_all_characters()
+    return {
+        "characters": characters,
+        "count": len(characters),
+        "max_count": 3
+    }
+
+
 @app.post("/api/character", response_model=CharacterResponse)
 async def api_create_character(data: CharacterCreate):
     """创建新角色"""
-    character = create_character(data.name)
+    # 检查角色数量限制
+    count = get_character_count()
+    if count >= 3:
+        raise HTTPException(status_code=400, detail="最多只能创建3个角色，请先删除一个角色")
+    
+    character = create_character(
+        name=data.name,
+        gender=data.gender or "",
+        age=data.age or 0,
+        height=data.height or 0,
+        weight=data.weight or 0,
+        education=data.education or "",
+        occupation=data.occupation or ""
+    )
     return character
 
 
@@ -75,6 +100,20 @@ async def api_get_character(character_id: int):
     if not character:
         raise HTTPException(status_code=404, detail="角色不存在")
     return character
+
+
+@app.delete("/api/character/{character_id}")
+async def api_delete_character(character_id: int):
+    """删除角色"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    
+    success = delete_character(character_id)
+    if success:
+        return {"message": f"角色 {character['name']} 已删除"}
+    else:
+        raise HTTPException(status_code=500, detail="删除失败")
 
 
 @app.get("/api/character/{character_id}/full")
@@ -294,6 +333,56 @@ async def api_get_activities(character_id: int, limit: int = 20):
 async def api_get_equipment(character_id: int):
     """获取装备列表"""
     return get_equipment(character_id)
+
+
+@app.post("/api/equipment/{equipment_id}/use")
+async def api_use_equipment(equipment_id: int):
+    """使用装备"""
+    with get_db() as conn:
+        # 获取装备信息
+        row = conn.execute(
+            "SELECT * FROM equipment WHERE id = ?",
+            (equipment_id,)
+        ).fetchone()
+        
+        if not row:
+            raise HTTPException(status_code=404, detail="装备不存在")
+        
+        equipment = dict(row)
+        character_id = equipment["character_id"]
+        
+        # 获取角色信息
+        character = get_character(character_id)
+        if not character:
+            raise HTTPException(status_code=404, detail="角色不存在")
+        
+        # 解析使用效果
+        use_bonus = json.loads(equipment.get("use_bonus", "{}"))
+        use_effect = equipment.get("use_effect", "感觉不错")
+        use_desc = equipment.get("use_desc", "使用物品")
+        
+        # 应用使用效果（临时属性加成）
+        updates = {}
+        for attr, bonus in use_bonus.items():
+            if attr in character and isinstance(character[attr], (int, float)):
+                # 使用效果是小数，需要累积到下一次活动
+                # 这里我们直接给一个小的属性提升
+                current = character[attr]
+                # 将小数转换为整数提升（每使用10次提升1点）
+                new_value = current + bonus
+                updates[attr] = new_value
+        
+        if updates:
+            update_character(character_id, **updates)
+        
+        # 删除装备（使用后消耗）
+        conn.execute("DELETE FROM equipment WHERE id = ?", (equipment_id,))
+        
+        return {
+            "message": f"{use_desc} - {use_effect}",
+            "equipment_name": equipment["name"],
+            "effects": use_bonus
+        }
 
 
 # ============ 称号 API ============

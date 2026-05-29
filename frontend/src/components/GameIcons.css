@@ -1,43 +1,192 @@
-.game-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  vertical-align: middle;
+/* RPG图标通用样式 */
+.rpg-icon {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  transition: all 0.2s;
 }
 
-.game-icon img {
-  display: block;
-  transition: transform 0.2s ease;
-}
-
-.game-icon:hover img {
+.rpg-icon:hover {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
   transform: scale(1.1);
 }
 
-/* 图标发光效果 */
-.game-icon.glow img {
-  filter: drop-shadow(0 0 4px currentColor);
-}
-
-/* 图标动画 */
-@keyframes iconPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-.game-icon.animate img {
-  animation: iconPulse 2s ease-in-out infinite;
-}
-
 /* 属性图标颜色 */
-.stat-icon-strength { color: #ff6b6b; }
-.stat-icon-intelligence { color: #4ecdc4; }
-.stat-icon-agility { color: #45b7d1; }
-.stat-icon-charisma { color: #f9ca24; }
-.stat-icon-willpower { color: #a55eea; }
+.stat-icon.strength {
+  color: #ef4444;
+}
 
-/* 稀有度发光 */
-.rarity-common img { filter: drop-shadow(0 0 2px #9d9d9d); }
-.rarity-rare img { filter: drop-shadow(0 0 4px #0070dd); }
-.rarity-epic img { filter: drop-shadow(0 0 6px #a335ee); }
-.rarity-legendary img { filter: drop-shadow(0 0 8px #ff8000); }
+.stat-icon.intelligence {
+  color: #3b82f6;
+}
+
+.stat-icon.agility {
+  color: #22c55e;
+}
+
+.stat-icon.charisma {
+  color: #a855f7;
+}
+
+.stat-icon.willpower {
+  color: #f59e0b;
+}
+
+/* 等级徽章 */
+.level-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  position: relative;
+  border: 2px solid;
+}
+
+.level-badge::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid;
+  opacity: 0.3;
+}
+
+.level-number {
+  position: relative;
+  z-index: 1;
+}
+
+/* 等级颜色 */
+.level-badge.common {
+  background: linear-gradient(135deg, #4a4a4a, #666666);
+  border-color: #888888;
+  color: #ffffff;
+}
+
+.level-badge.common::before {
+  border-color: #888888;
+}
+
+.level-badge.uncommon {
+  background: linear-gradient(135deg, #1a5e1a, #2d8e2d);
+  border-color: #4ade80;
+  color: #ffffff;
+}
+
+.level-badge.uncommon::before {
+  border-color: #4ade80;
+}
+
+.level-badge.rare {
+  background: linear-gradient(135deg, #1a3a6e, #2d5aae);
+  border-color: #60a5fa;
+  color: #ffffff;
+}
+
+.level-badge.rare::before {
+  border-color: #60a5fa;
+}
+
+.level-badge.epic {
+  background: linear-gradient(135deg, #5a1a8e, #8e2dae);
+  border-color: #c084fc;
+  color: #ffffff;
+}
+
+.level-badge.epic::before {
+  border-color: #c084fc;
+}
+
+.level-badge.legendary {
+  background: linear-gradient(135deg, #8e5a1a, #ae8e2d);
+  border-color: #fbbf24;
+  color: #ffffff;
+  animation: legendary-glow 2s ease-in-out infinite;
+}
+
+.level-badge.legendary::before {
+  border-color: #fbbf24;
+  animation: legendary-glow 2s ease-in-out infinite;
+}
+
+@keyframes legendary-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.8);
+  }
+}
+
+/* 稀有度边框 */
+.rarity-common {
+  border-color: #9d9d9d !important;
+}
+
+.rarity-rare {
+  border-color: #0070dd !important;
+  box-shadow: 0 0 8px rgba(0, 112, 221, 0.3);
+}
+
+.rarity-epic {
+  border-color: #a335ee !important;
+  box-shadow: 0 0 12px rgba(163, 53, 238, 0.4);
+}
+
+.rarity-legendary {
+  border-color: #ff8000 !important;
+  box-shadow: 0 0 16px rgba(255, 128, 0, 0.5);
+  animation: legendary-border-glow 2s ease-in-out infinite;
+}
+
+@keyframes legendary-border-glow {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(255, 128, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 128, 0, 0.7);
+  }
+}
+
+/* 稀有度背景光效 */
+.rarity-rare::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #0070dd, transparent);
+}
+
+.rarity-epic::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #a335ee, transparent);
+}
+
+.rarity-legendary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #ff8000, #ffaa00, #ff8000, transparent);
+  animation: legendary-shine 3s linear infinite;
+}
+
+@keyframes legendary-shine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}

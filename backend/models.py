@@ -5,6 +5,12 @@ from datetime import datetime
 
 class CharacterCreate(BaseModel):
     name: str
+    gender: Optional[str] = ""
+    age: Optional[int] = 0
+    height: Optional[float] = 0
+    weight: Optional[float] = 0
+    education: Optional[str] = ""
+    occupation: Optional[str] = ""
 
 
 class CharacterResponse(BaseModel):
@@ -18,6 +24,12 @@ class CharacterResponse(BaseModel):
     agility: int
     charisma: int
     willpower: int
+    gender: Optional[str] = ""
+    age: Optional[int] = 0
+    height: Optional[float] = 0
+    weight: Optional[float] = 0
+    education: Optional[str] = ""
+    occupation: Optional[str] = ""
     created_at: Optional[str] = None
 
 
@@ -33,6 +45,9 @@ class EquipmentResponse(BaseModel):
     rarity: str
     stat_bonuses: Optional[str]
     special_effect: Optional[str]
+    use_desc: Optional[str] = "使用物品"
+    use_effect: Optional[str] = "感觉不错"
+    use_bonus: Optional[str] = "{}"
     equipped: bool
     created_at: Optional[str]
 

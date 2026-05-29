@@ -1,9 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
 
 :root {
   /* 游戏主题色 */
   --gold: #f5c518;
   --gold-dark: #c9a400;
+  --gold-light: #ffd700;
   --exp-green: #4ade80;
   --hp-red: #ef4444;
   --mp-blue: #3b82f6;
@@ -30,6 +32,12 @@
   --primary: #6366f1;
   --primary-glow: #6366f140;
   --secondary: #22d3ee;
+  
+  /* RPG特殊色 */
+  --rarity-common: #9d9d9d;
+  --rarity-rare: #0070dd;
+  --rarity-epic: #a335ee;
+  --rarity-legendary: #ff8000;
 }
 
 * {
@@ -259,4 +267,284 @@ body::before {
 .pixel-text {
   font-family: 'Press Start 2P', cursive;
   image-rendering: pixelated;
+}
+
+/* 中世纪风格字体 */
+.medieval-text {
+  font-family: 'MedievalSharp', cursive;
+}
+
+/* RPG边框装饰 */
+.rpg-border {
+  border: 2px solid var(--border-dark);
+  position: relative;
+  background: var(--bg-card);
+}
+
+.rpg-border::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.rpg-border::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* 角落装饰 */
+.corner-decoration {
+  position: relative;
+}
+
+.corner-decoration::before,
+.corner-decoration::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--gold);
+}
+
+.corner-decoration::before {
+  top: -2px;
+  left: -2px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.corner-decoration::after {
+  bottom: -2px;
+  right: -2px;
+  border-left: none;
+  border-top: none;
+}
+
+/* 发光文字 */
+.glow-text {
+  text-shadow: 0 0 10px var(--gold), 0 0 20px var(--gold), 0 0 30px var(--gold);
+}
+
+/* 等级文字渐变 */
+.level-gradient {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* RPG进度条 */
+.rpg-progress {
+  height: 24px;
+  background: var(--bg-darkest);
+  border: 2px solid var(--border-dark);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.rpg-progress::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+}
+
+.rpg-progress-fill {
+  height: 100%;
+  transition: width 0.5s ease;
+  position: relative;
+  background: linear-gradient(90deg, #059669, #10b981);
+}
+
+.rpg-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+}
+
+/* 装备卡片闪光效果 */
+.equipment-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.equipment-shine::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 55%,
+    transparent 60%
+  );
+  animation: equipment-shine 3s ease-in-out infinite;
+}
+
+@keyframes equipment-shine {
+  0% {
+    transform: translateX(-100%) translateY(-100%);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%);
+  }
+}
+
+/* RPG工具提示 */
+.rpg-tooltip {
+  position: relative;
+}
+
+.rpg-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  background: var(--bg-darkest);
+  border: 1px solid var(--gold);
+  color: var(--text-primary);
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s;
+  z-index: 100;
+}
+
+.rpg-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+  bottom: calc(100% + 8px);
+}
+
+/* 粒子效果背景 */
+.particle-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.particle-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, var(--gold), transparent),
+    radial-gradient(2px 2px at 40px 70px, var(--gold), transparent),
+    radial-gradient(2px 2px at 50px 160px, var(--gold), transparent),
+    radial-gradient(2px 2px at 90px 40px, var(--gold), transparent),
+    radial-gradient(2px 2px at 130px 80px, var(--gold), transparent);
+  background-size: 200px 200px;
+  animation: particles 20s linear infinite;
+  opacity: 0.3;
+}
+
+@keyframes particles {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-200px);
+  }
+}
+
+/* RPG按钮悬停效果 */
+.rpg-btn {
+  padding: 12px 24px;
+  background: linear-gradient(180deg, var(--bg-card-hover) 0%, var(--bg-card) 100%);
+  border: 2px solid var(--border-dark);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  overflow: hidden;
+}
+
+.rpg-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.rpg-btn:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 15px var(--border-glow);
+}
+
+.rpg-btn:hover::before {
+  left: 100%;
+}
+
+.rpg-btn:active {
+  transform: translateY(2px);
+}
+
+/* 等级提升动画 */
+@keyframes level-up {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.level-up-animation {
+  animation: level-up 0.5s ease-out;
+}
+
+/* 经验值增加动画 */
+@keyframes exp-gain {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+}
+
+.exp-gain-animation {
+  animation: exp-gain 1s ease-out forwards;
 }

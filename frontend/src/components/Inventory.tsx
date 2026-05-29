@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getEquipment } from '../services/api';
+import { getEquipment, useEquipment } from '../services/api';
 import type { Equipment } from '../services/api';
 import './Inventory.css';
 
@@ -11,6 +11,7 @@ function Inventory({ characterId }: InventoryProps) {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<Equipment | null>(null);
+  const [useMessage, setUseMessage] = useState<string | null>(null);
 
   useEffect(() => {
     loadEquipment();
@@ -47,6 +48,22 @@ function Inventory({ characterId }: InventoryProps) {
     return colors[rarity] || '1px solid #9d9d9d33';
   };
 
+  const handleUseItem = async (item: Equipment) => {
+    try {
+      const result = await useEquipment(item.id);
+      setUseMessage(result.message);
+      setSelectedItem(null);
+      loadEquipment(); // 重新加载装备列表
+      
+      // 3秒后清除消息
+      setTimeout(() => setUseMessage(null), 3000);
+    } catch (e) {
+      console.error('使用装备失败:', e);
+      setUseMessage('使用失败');
+      setTimeout(() => setUseMessage(null), 3000);
+    }
+  };
+
   const rarityCounts = equipment.reduce((acc, item) => {
     acc[item.rarity] = (acc[item.rarity] || 0) + 1;
     return acc;
@@ -62,6 +79,13 @@ function Inventory({ characterId }: InventoryProps) {
         <h2>   装备背包</h2>
         <p className="equip-count">共 {equipment.length} 件装备</p>
       </header>
+
+      {/* 使用消息提示 */}
+      {useMessage && (
+        <div className="use-message">
+          ✨ {useMessage}
+        </div>
+      )}
 
       {/* 稀有度统计 */}
       <div className="rarity-stats">
@@ -114,6 +138,21 @@ function Inventory({ characterId }: InventoryProps) {
             </div>
             <div className="detail-body">
               <p className="detail-desc">{selectedItem.description}</p>
+              
+              {/* 使用效果 */}
+              {selectedItem.use_desc && (
+                <div className="use-effect">
+                  <span className="use-label">使用方式:</span>
+                  <span className="use-text">{selectedItem.use_desc}</span>
+                </div>
+              )}
+              {selectedItem.use_effect && (
+                <div className="use-effect">
+                  <span className="use-label">使用效果:</span>
+                  <span className="use-text">{selectedItem.use_effect}</span>
+                </div>
+              )}
+              
               {selectedItem.special_effect && (
                 <div className="special-effect">
                   <span className="effect-label">特殊效果:</span>
@@ -132,6 +171,15 @@ function Inventory({ characterId }: InventoryProps) {
                   </div>
                 </div>
               )}
+              
+              {/* 使用按钮 */}
+              <button 
+                className="use-btn"
+                onClick={() => handleUseItem(selectedItem)}
+              >
+                使用物品
+              </button>
+              
               <div className="detail-meta">
                 <span>获得时间: {new Date(selectedItem.created_at).toLocaleDateString('zh-CN')}</span>
               </div>

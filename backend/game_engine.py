@@ -361,46 +361,73 @@ RARITY_CONFIG = {
     "传说": {"color": "#ff8000", "weight": 5, "stat_range": (10, 15)},
 }
 
-# 装备池
+# 装备池（贴近现实生活的物品）
 EQUIPMENT_POOL = {
     "学习": [
-        {"name": "学霸眼镜", "desc": "戴上后看书效率+50%", "rarity": "稀有", "bonus": {"intelligence": 3}},
-        {"name": "知识之书", "desc": "蕴含无穷智慧的古籍", "rarity": "史诗", "bonus": {"intelligence": 6}},
-        {"name": "专注护目镜", "desc": "减少99%的分心概率", "rarity": "稀有", "bonus": {"willpower": 3}},
-        {"name": "速记笔", "desc": "写字速度翻倍", "rarity": "普通", "bonus": {"intelligence": 1}},
-        {"name": "记忆面包", "desc": "吃下就能记住知识", "rarity": "传说", "bonus": {"intelligence": 10}},
+        {"name": "学霸眼镜", "desc": "戴上后看书效率+50%", "rarity": "稀有", "bonus": {"intelligence": 3}, "use_desc": "擦干净镜片戴上", "use_effect": "视野清晰，专注力提升", "use_bonus": {"intelligence": 0.3}},
+        {"name": "知识之书", "desc": "蕴含无穷智慧的古籍", "rarity": "史诗", "bonus": {"intelligence": 6}, "use_desc": "翻开阅读一章", "use_effect": "知识涌入脑海", "use_bonus": {"intelligence": 0.5}},
+        {"name": "专注护目镜", "desc": "减少99%的分心概率", "rarity": "稀有", "bonus": {"willpower": 3}, "use_desc": "戴上护目镜开始学习", "use_effect": "世界安静了，只有知识", "use_bonus": {"willpower": 0.3}},
+        {"name": "速记笔", "desc": "写字速度翻倍", "rarity": "普通", "bonus": {"intelligence": 1}, "use_desc": "用笔记录重点", "use_effect": "笔记工整，记忆加深", "use_bonus": {"intelligence": 0.1}},
+        {"name": "记忆面包", "desc": "吃下就能记住知识", "rarity": "传说", "bonus": {"intelligence": 10}, "use_desc": "吃下面包", "use_effect": "知识点自动记忆", "use_bonus": {"intelligence": 1.0}},
+        {"name": "荧光笔套装", "desc": "重点一目了然", "rarity": "普通", "bonus": {"intelligence": 1}, "use_desc": "标记重点内容", "use_effect": "重点突出，复习更高效", "use_bonus": {"intelligence": 0.1}},
+        {"name": "隔音耳塞", "desc": "屏蔽外界干扰", "rarity": "稀有", "bonus": {"willpower": 2}, "use_desc": "戴上耳塞", "use_effect": "世界清静了", "use_bonus": {"willpower": 0.2}},
     ],
     "运动": [
-        {"name": "疾风跑鞋", "desc": "穿上后跑步速度+30%", "rarity": "稀有", "bonus": {"agility": 3}},
-        {"name": "力量护腕", "desc": "隐藏的力量加成", "rarity": "稀有", "bonus": {"strength": 3}},
-        {"name": "能量饮料(无限)", "desc": "永不枯竭的能量来源", "rarity": "传说", "bonus": {"strength": 10}},
-        {"name": "运动手环", "desc": "记录每一次突破", "rarity": "普通", "bonus": {"agility": 1}},
-        {"name": "筋膜枪", "desc": "快速恢复肌肉疲劳", "rarity": "史诗", "bonus": {"strength": 5}},
+        {"name": "毛巾", "desc": "运动后擦汗必备", "rarity": "普通", "bonus": {"strength": 1}, "use_desc": "运动后擦干汗水", "use_effect": "更清爽了", "use_bonus": {"charisma": 0.1}},
+        {"name": "疾风跑鞋", "desc": "穿上后跑步速度+30%", "rarity": "稀有", "bonus": {"agility": 3}, "use_desc": "系好鞋带出发", "use_effect": "脚步轻盈，速度提升", "use_bonus": {"agility": 0.3}},
+        {"name": "力量护腕", "desc": "隐藏的力量加成", "rarity": "稀有", "bonus": {"strength": 3}, "use_desc": "戴上护腕热身", "use_effect": "手腕有力，动作标准", "use_bonus": {"strength": 0.3}},
+        {"name": "运动水壶", "desc": "及时补充水分", "rarity": "普通", "bonus": {"strength": 1}, "use_desc": "喝一口水", "use_effect": "水分补充，体力恢复", "use_bonus": {"strength": 0.1}},
+        {"name": "运动手环", "desc": "记录每一次突破", "rarity": "普通", "bonus": {"agility": 1}, "use_desc": "查看运动数据", "use_effect": "看到进步，更有动力", "use_bonus": {"agility": 0.1}},
+        {"name": "筋膜枪", "desc": "快速恢复肌肉疲劳", "rarity": "史诗", "bonus": {"strength": 5}, "use_desc": "按摩放松肌肉", "use_effect": "肌肉放松，疲劳消散", "use_bonus": {"strength": 0.5}},
+        {"name": "瑜伽垫", "desc": "舒适防滑", "rarity": "普通", "bonus": {"agility": 2}, "use_desc": "铺开瑜伽垫", "use_effect": "开始拉伸，身体柔软", "use_bonus": {"agility": 0.2}},
+        {"name": "蛋白粉", "desc": "肌肉修复加速器", "rarity": "稀有", "bonus": {"strength": 4}, "use_desc": "冲一杯蛋白粉", "use_effect": "肌肉修复，力量增长", "use_bonus": {"strength": 0.4}},
+        {"name": "泡沫轴", "desc": "深度放松肌肉", "rarity": "稀有", "bonus": {"strength": 2}, "use_desc": "滚动放松大腿", "use_effect": "肌肉松开，舒适感up", "use_bonus": {"strength": 0.2}},
     ],
     "编程": [
-        {"name": "机械键盘(RGB)", "desc": "打字速度+40%，bug率-20%", "rarity": "稀有", "bonus": {"intelligence": 3}},
-        {"name": "Stack Overflow权杖", "desc": "可召唤全球程序员的帮助", "rarity": "传说", "bonus": {"intelligence": 12}},
-        {"name": "调试放大镜", "desc": "一眼看穿所有bug", "rarity": "史诗", "bonus": {"intelligence": 6}},
-        {"name": "代码咖啡杯", "desc": "咖啡因无限续杯", "rarity": "稀有", "bonus": {"willpower": 3}},
-        {"name": "程序员格子衫", "desc": "传说中的编程圣衣", "rarity": "史诗", "bonus": {"intelligence": 5}},
+        {"name": "机械键盘(RGB)", "desc": "打字速度+40%，bug率-20%", "rarity": "稀有", "bonus": {"intelligence": 3}, "use_desc": "敲击键盘写代码", "use_effect": "手感极佳，代码流畅", "use_bonus": {"intelligence": 0.3}},
+        {"name": "Stack Overflow权杖", "desc": "可召唤全球程序员的帮助", "rarity": "传说", "bonus": {"intelligence": 12}, "use_desc": "搜索解决方案", "use_effect": "答案找到了！", "use_bonus": {"intelligence": 1.0}},
+        {"name": "调试放大镜", "desc": "一眼看穿所有bug", "rarity": "史诗", "bonus": {"intelligence": 6}, "use_desc": "用放大镜找bug", "use_effect": "bug无处遁形", "use_bonus": {"intelligence": 0.5}},
+        {"name": "代码咖啡杯", "desc": "咖啡因无限续杯", "rarity": "稀有", "bonus": {"willpower": 3}, "use_desc": "喝一口咖啡", "use_effect": "精神焕发，继续coding", "use_bonus": {"willpower": 0.3}},
+        {"name": "程序员格子衫", "desc": "传说中的编程圣衣", "rarity": "史诗", "bonus": {"intelligence": 5}, "use_desc": "穿上格子衫", "use_effect": "编程之力涌来", "use_bonus": {"intelligence": 0.5}},
+        {"name": "USB小风扇", "desc": "散热神器", "rarity": "普通", "bonus": {"willpower": 1}, "use_desc": "打开风扇吹吹", "use_effect": "凉爽了，头脑清醒", "use_bonus": {"willpower": 0.1}},
+        {"name": "蓝光眼镜", "desc": "保护眼睛", "rarity": "普通", "bonus": {"willpower": 1}, "use_desc": "戴上蓝光眼镜", "use_effect": "眼睛不累了", "use_bonus": {"willpower": 0.1}},
+        {"name": "人体工学椅", "desc": "久坐不累", "rarity": "稀有", "bonus": {"willpower": 4}, "use_desc": "调整坐姿", "use_effect": "腰不酸了，代码更久", "use_bonus": {"willpower": 0.4}},
     ],
     "社交": [
-        {"name": "魅力项链", "desc": "社交魅力+50%", "rarity": "稀有", "bonus": {"charisma": 3}},
-        {"name": "破冰笑话集", "desc": "永远不会冷场", "rarity": "普通", "bonus": {"charisma": 1}},
-        {"name": "读心术眼镜", "desc": "看穿对方真实想法", "rarity": "传说", "bonus": {"charisma": 10}},
-        {"name": "社交达人徽章", "desc": "人见人爱的证明", "rarity": "史诗", "bonus": {"charisma": 6}},
+        {"name": "魅力项链", "desc": "社交魅力+50%", "rarity": "稀有", "bonus": {"charisma": 3}, "use_desc": "戴上项链出门", "use_effect": "自信满满", "use_bonus": {"charisma": 0.3}},
+        {"name": "破冰笑话集", "desc": "永远不会冷场", "rarity": "普通", "bonus": {"charisma": 1}, "use_desc": "讲个笑话", "use_effect": "气氛活跃了", "use_bonus": {"charisma": 0.1}},
+        {"name": "口香糖", "desc": "清新口气", "rarity": "普通", "bonus": {"charisma": 1}, "use_desc": "嚼一片口香糖", "use_effect": "口气清新，更自信", "use_bonus": {"charisma": 0.1}},
+        {"name": "社交达人徽章", "desc": "人见人爱的证明", "rarity": "史诗", "bonus": {"charisma": 6}, "use_desc": "佩戴徽章", "use_effect": "社交buff加满", "use_bonus": {"charisma": 0.6}},
+        {"name": "香水", "desc": "迷人气息", "rarity": "稀有", "bonus": {"charisma": 2}, "use_desc": "喷一点香水", "use_effect": "香气迷人，魅力up", "use_bonus": {"charisma": 0.2}},
+        {"name": "微笑镜子", "desc": "练习微笑", "rarity": "普通", "bonus": {"charisma": 1}, "use_desc": "对着镜子微笑", "use_effect": "笑容更自然", "use_bonus": {"charisma": 0.1}},
     ],
     "工作": [
-        {"name": "效率手环", "desc": "工作效率+30%", "rarity": "稀有", "bonus": {"willpower": 3}},
-        {"name": "时间管理沙漏", "desc": "每天多出2小时", "rarity": "史诗", "bonus": {"willpower": 6}},
-        {"name": "升职加薪符", "desc": "隐藏的幸运加成", "rarity": "稀有", "bonus": {"charisma": 3}},
-        {"name": "老板看不见斗篷", "desc": "摸鱼神器", "rarity": "传说", "bonus": {"agility": 10}},
+        {"name": "效率手环", "desc": "工作效率+30%", "rarity": "稀有", "bonus": {"willpower": 3}, "use_desc": "戴上手环开工", "use_effect": "专注模式启动", "use_bonus": {"willpower": 0.3}},
+        {"name": "时间管理沙漏", "desc": "每天多出2小时", "rarity": "史诗", "bonus": {"willpower": 6}, "use_desc": "翻转沙漏开始计时", "use_effect": "时间观念增强", "use_bonus": {"willpower": 0.6}},
+        {"name": "待办清单", "desc": "任务一目了然", "rarity": "普通", "bonus": {"willpower": 1}, "use_desc": "列出今日任务", "use_effect": "目标清晰，效率提升", "use_bonus": {"willpower": 0.1}},
+        {"name": "提神薄荷糖", "desc": "清凉醒脑", "rarity": "普通", "bonus": {"willpower": 1}, "use_desc": "吃一颗薄荷糖", "use_effect": "精神一振", "use_bonus": {"willpower": 0.1}},
+        {"name": "番茄钟", "desc": "25分钟专注法", "rarity": "稀有", "bonus": {"willpower": 3}, "use_desc": "启动番茄钟", "use_effect": "25分钟全神贯注", "use_bonus": {"willpower": 0.3}},
+        {"name": "升职加薪符", "desc": "隐藏的幸运加成", "rarity": "稀有", "bonus": {"charisma": 3}, "use_desc": "默默祈祷", "use_effect": "感觉运气变好了", "use_bonus": {"charisma": 0.3}},
+    ],
+    "生活": [
+        {"name": "保温杯", "desc": "多喝热水", "rarity": "普通", "bonus": {"willpower": 1}, "use_desc": "喝一口热水", "use_effect": "暖暖的，很贴心", "use_bonus": {"willpower": 0.1}},
+        {"name": "眼罩", "desc": "助眠神器", "rarity": "普通", "bonus": {"willpower": 1}, "use_desc": "戴上眼罩休息", "use_effect": "进入深度睡眠", "use_bonus": {"willpower": 0.1}},
+        {"name": "香薰蜡烛", "desc": "营造氛围", "rarity": "稀有", "bonus": {"charisma": 2}, "use_desc": "点燃蜡烛", "use_effect": "放松身心", "use_bonus": {"charisma": 0.2}},
+        {"name": "按摩椅", "desc": "全身放松", "rarity": "史诗", "bonus": {"strength": 5}, "use_desc": "坐上按摩椅", "use_effect": "全身放松，疲劳消散", "use_bonus": {"strength": 0.5}},
+        {"name": "绿植", "desc": "净化空气", "rarity": "普通", "bonus": {"charisma": 1}, "use_desc": "给植物浇浇水", "use_effect": "心情变好", "use_bonus": {"charisma": 0.1}},
+        {"name": "抱枕", "desc": "柔软舒适", "rarity": "普通", "bonus": {"willpower": 1}, "use_desc": "抱一抱抱枕", "use_effect": "压力释放", "use_bonus": {"willpower": 0.1}},
+    ],
+    "休息": [
+        {"name": "助眠白噪音", "desc": "雨声、海浪声", "rarity": "普通", "bonus": {"willpower": 1}, "use_desc": "播放白噪音", "use_effect": "进入深度睡眠", "use_bonus": {"willpower": 0.1}},
+        {"name": "蒸汽眼罩", "desc": "热敷眼睛", "rarity": "稀有", "bonus": {"willpower": 2}, "use_desc": "戴上蒸汽眼罩", "use_effect": "眼睛疲劳消散", "use_bonus": {"willpower": 0.2}},
+        {"name": "冥想APP会员", "desc": "专业引导冥想", "rarity": "稀有", "bonus": {"willpower": 3}, "use_desc": "开始冥想", "use_effect": "内心平静", "use_bonus": {"willpower": 0.3}},
+        {"name": "薰衣草精油", "desc": "安神助眠", "rarity": "普通", "bonus": {"willpower": 1}, "use_desc": "滴一滴精油", "use_effect": "香气弥漫，放松入睡", "use_bonus": {"willpower": 0.1}},
     ],
     "其他": [
-        {"name": "神秘徽章", "desc": "来历不明但感觉很厉害", "rarity": "普通", "bonus": {"strength": 1}},
-        {"name": "幸运草", "desc": "今天运气不错", "rarity": "普通", "bonus": {"charisma": 1}},
-        {"name": "时光碎片", "desc": "记录这一刻的纪念品", "rarity": "稀有", "bonus": {"intelligence": 2}},
-        {"name": "全能水晶", "desc": "蕴含所有属性的力量", "rarity": "传说", "bonus": {"strength": 3, "intelligence": 3, "agility": 3, "charisma": 3, "willpower": 3}},
+        {"name": "神秘徽章", "desc": "来历不明但感觉很厉害", "rarity": "普通", "bonus": {"strength": 1}, "use_desc": "佩戴徽章", "use_effect": "感觉神秘力量", "use_bonus": {"strength": 0.1}},
+        {"name": "幸运草", "desc": "今天运气不错", "rarity": "普通", "bonus": {"charisma": 1}, "use_desc": "把幸运草放进口袋", "use_effect": "运气提升", "use_bonus": {"charisma": 0.1}},
+        {"name": "时光碎片", "desc": "记录这一刻的纪念品", "rarity": "稀有", "bonus": {"intelligence": 2}, "use_desc": "回忆美好时光", "use_effect": "心情愉悦", "use_bonus": {"intelligence": 0.2}},
+        {"name": "全能水晶", "desc": "蕴含所有属性的力量", "rarity": "传说", "bonus": {"strength": 3, "intelligence": 3, "agility": 3, "charisma": 3, "willpower": 3}, "use_desc": "握紧水晶", "use_effect": "全属性临时提升", "use_bonus": {"strength": 0.3, "intelligence": 0.3, "agility": 0.3, "charisma": 0.3, "willpower": 0.3}},
     ],
 }
 
@@ -457,7 +484,10 @@ def generate_equipment(activity_type: str, level: int) -> Optional[Dict]:
         "description": equipment["desc"],
         "rarity": equipment["rarity"],
         "stat_bonuses": adjusted_bonus,
-        "special_effect": None
+        "special_effect": None,
+        "use_desc": equipment.get("use_desc", "使用物品"),
+        "use_effect": equipment.get("use_effect", "感觉不错"),
+        "use_bonus": equipment.get("use_bonus", {})
     }
 
 

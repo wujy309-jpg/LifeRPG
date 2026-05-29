@@ -18,6 +18,13 @@ export interface Character {
   agility: number;
   charisma: number;
   willpower: number;
+  gender?: string;
+  age?: number;
+  height?: number;
+  weight?: number;
+  education?: string;
+  occupation?: string;
+  created_at?: string;
 }
 
 export interface ActivityLog {
@@ -39,6 +46,9 @@ export interface Equipment {
   rarity: string;
   stat_bonuses: string;
   special_effect: string;
+  use_desc: string;
+  use_effect: string;
+  use_bonus: string;
   equipped: boolean;
   created_at: string;
 }
@@ -91,8 +101,34 @@ export interface DailySummary {
   summary: string | null;
 }
 
-export const createCharacter = async (name: string): Promise<Character> => {
-  const res = await api.post('/character', { name });
+export const getAllCharacters = async (): Promise<{ characters: Character[], count: number, max_count: number }> => {
+  const res = await api.get('/characters');
+  return res.data;
+};
+
+export const createCharacter = async (
+  name: string,
+  gender?: string,
+  age?: number,
+  height?: number,
+  weight?: number,
+  education?: string,
+  occupation?: string
+): Promise<Character> => {
+  const res = await api.post('/character', { 
+    name,
+    gender: gender || '',
+    age: age || 0,
+    height: height || 0,
+    weight: weight || 0,
+    education: education || '',
+    occupation: occupation || ''
+  });
+  return res.data;
+};
+
+export const deleteCharacter = async (characterId: number): Promise<any> => {
+  const res = await api.delete(`/character/${characterId}`);
   return res.data;
 };
 
@@ -113,6 +149,11 @@ export const getActivities = async (characterId: number, limit: number = 20): Pr
 
 export const getEquipment = async (characterId: number): Promise<Equipment[]> => {
   const res = await api.get(`/equipment/${characterId}`);
+  return res.data;
+};
+
+export const useEquipment = async (equipmentId: number): Promise<any> => {
+  const res = await api.post(`/equipment/${equipmentId}/use`);
   return res.data;
 };
 
