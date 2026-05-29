@@ -51,6 +51,67 @@
   text-transform: uppercase;
 }
 
+/* 侧边栏时间显示 */
+.sidebar-time {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-dark);
+}
+
+/* 侧边栏日历 */
+.sidebar-calendar {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-dark);
+  overflow: hidden;
+}
+
+.sidebar-calendar .calendar-container {
+  background: transparent;
+  border: none;
+  padding: 0;
+  max-width: none;
+}
+
+.sidebar-calendar .calendar-header {
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+.sidebar-calendar .month {
+  font-size: 14px;
+}
+
+.sidebar-calendar .year {
+  font-size: 12px;
+}
+
+.sidebar-calendar .nav-btn {
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
+}
+
+.sidebar-calendar .weekday {
+  font-size: 10px;
+}
+
+.sidebar-calendar .calendar-day {
+  min-height: 28px;
+}
+
+.sidebar-calendar .day-number {
+  font-size: 11px;
+}
+
+.sidebar-calendar .calendar-footer {
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.sidebar-calendar .today-btn {
+  padding: 6px;
+  font-size: 11px;
+}
+
 /* 导航链接 */
 .nav-links {
   flex: 1;
@@ -404,6 +465,34 @@
   width: 3px;
   height: 60%;
   background: var(--secondary);
+  border-radius: 0 2px 2px 0;
+}
+
+/* ========== 主题切换按钮 ========== */
+.theme-btn {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+}
+
+.theme-btn:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border-dark);
+}
+
+.theme-btn:hover::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--mana-purple);
   border-radius: 0 2px 2px 0;
 }
 

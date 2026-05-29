@@ -12,7 +12,9 @@ from database import (
     init_db, create_character, get_character, update_character,
     add_activity_log, get_activity_logs, add_equipment, get_equipment,
     add_title, get_titles, add_quest, get_quests, complete_quest, get_db,
-    get_all_characters, get_character_count, delete_character
+    get_all_characters, get_character_count, delete_character,
+    get_activity_stats, get_activity_history, get_attribute_history,
+    get_weekly_activity_type_stats
 )
 from game_engine import (
     classify_activity, calculate_exp_gain, calculate_gold_gain,
@@ -495,6 +497,52 @@ async def api_status():
         "ai_status": ai_status,
         "available_models": models
     }
+
+
+# ============ 统计 API ============
+
+@app.get("/api/stats/{character_id}")
+async def api_get_stats(character_id: int):
+    """获取角色统计数据"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    
+    stats = get_activity_stats(character_id)
+    return stats
+
+
+@app.get("/api/stats/{character_id}/history")
+async def api_get_activity_history(character_id: int, days: int = 30):
+    """获取活动历史"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    
+    history = get_activity_history(character_id, days)
+    return {"history": history, "days": days}
+
+
+@app.get("/api/stats/{character_id}/attributes")
+async def api_get_attribute_history(character_id: int, days: int = 30):
+    """获取属性变化历史"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    
+    history = get_attribute_history(character_id, days)
+    return {"history": history, "days": days}
+
+
+@app.get("/api/stats/{character_id}/weekly-types")
+async def api_get_weekly_types(character_id: int):
+    """获取本周活动类型统计"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    
+    types = get_weekly_activity_type_stats(character_id)
+    return {"types": types}
 
 
 # ============ AI配置 API ============

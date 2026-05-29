@@ -194,6 +194,54 @@ export const getDailySummary = async (characterId: number): Promise<DailySummary
   return res.data;
 };
 
+// 统计相关API
+export interface ActivityStats {
+  total_count: number;
+  today_count: number;
+  week_count: number;
+  total_exp: number;
+  total_gold: number;
+  type_stats: { activity_type: string; count: number }[];
+  most_common: string;
+  consecutive_days: number;
+}
+
+export interface ActivityHistory {
+  date: string;
+  count: number;
+  exp: number;
+  gold: number;
+}
+
+export interface AttributeHistory {
+  date: string;
+  strength: number;
+  intelligence: number;
+  agility: number;
+  charisma: number;
+  willpower: number;
+}
+
+export const getActivityStats = async (characterId: number): Promise<ActivityStats> => {
+  const res = await api.get(`/stats/${characterId}`);
+  return res.data;
+};
+
+export const getActivityHistory = async (characterId: number, days: number = 30): Promise<ActivityHistory[]> => {
+  const res = await api.get(`/stats/${characterId}/history?days=${days}`);
+  return res.data.history;
+};
+
+export const getAttributeHistory = async (characterId: number, days: number = 30): Promise<AttributeHistory[]> => {
+  const res = await api.get(`/stats/${characterId}/attributes?days=${days}`);
+  return res.data.history;
+};
+
+export const getWeeklyActivityTypes = async (characterId: number): Promise<Record<string, number>> => {
+  const res = await api.get(`/stats/${characterId}/weekly-types`);
+  return res.data.types;
+};
+
 export const getSystemStatus = async (): Promise<any> => {
   const res = await api.get('/status');
   return res.data;

@@ -1,0 +1,84 @@
+.time-display {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.time-display.small {
+  padding: 8px;
+}
+
+.time-display.small .time-clock {
+  font-size: 20px;
+}
+
+.time-display.small .time-date {
+  font-size: 11px;
+}
+
+.time-display.medium {
+  padding: 16px;
+}
+
+.time-display.large {
+  padding: 24px;
+}
+
+.time-display.large .time-clock {
+  font-size: 48px;
+}
+
+.time-display.large .time-date {
+  font-size: 16px;
+}
+
+.time-period {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.time-clock {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-gold);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(245, 197, 24, 0.3);
+}
+
+.time-digits {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.time-date {
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.time-greeting {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* 脉冲动画 */
+@keyframes time-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.time-display:hover .time-clock {
+  animation: time-pulse 2s ease-in-out infinite;
+}

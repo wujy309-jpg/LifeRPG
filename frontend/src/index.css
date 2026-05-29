@@ -548,3 +548,83 @@ body::before {
 .exp-gain-animation {
   animation: exp-gain 1s ease-out forwards;
 }
+
+/* ========== 主题样式 ========== */
+
+/* 明亮主题 */
+[data-theme="light"] {
+  --gold: #d4a017;
+  --gold-dark: #b8860b;
+  --gold-light: #f0c040;
+  --exp-green: #16a34a;
+  --hp-red: #dc2626;
+  --mp-blue: #2563eb;
+  --mana-purple: #9333ea;
+  
+  --bg-darkest: #f5f5f5;
+  --bg-dark: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f0f0;
+  --bg-sidebar: #fafafa;
+  
+  --border-dark: #e0e0e0;
+  --border-gold: #d4a01740;
+  --border-glow: #d4a01720;
+  
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-gold: #b8860b;
+  
+  --primary: #4f46e5;
+  --primary-glow: #4f46e540;
+  --secondary: #0891b2;
+}
+
+/* 像素风格主题 */
+[data-theme="pixel"] {
+  --gold: #ffcc00;
+  --gold-dark: #cc9900;
+  --gold-light: #ffdd33;
+  --exp-green: #33ff33;
+  --hp-red: #ff3333;
+  --mp-blue: #3333ff;
+  --mana-purple: #cc33ff;
+  
+  --bg-darkest: #0a0a1a;
+  --bg-dark: #111128;
+  --bg-card: #1a1a35;
+  --bg-card-hover: #252545;
+  --bg-sidebar: #0f0f22;
+  
+  --border-dark: #333355;
+  --border-gold: #ffcc0040;
+  --border-glow: #ffcc0020;
+  
+  --text-primary: #eeeeff;
+  --text-secondary: #8888bb;
+  --text-gold: #ffcc00;
+  
+  --primary: #6666ff;
+  --primary-glow: #6666ff40;
+  --secondary: #33cccc;
+  
+  --rarity-common: #aaaaaa;
+  --rarity-rare: #3366ff;
+  --rarity-epic: #cc33ff;
+  --rarity-legendary: #ff6600;
+}
+
+[data-theme="pixel"] body {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+[data-theme="pixel"] .pixel-text {
+  font-family: 'Press Start 2P', cursive;
+}
+
+/* 主题切换动画 */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

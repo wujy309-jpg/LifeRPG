@@ -5,10 +5,14 @@ import ActivityLog from './components/ActivityLog';
 import CharacterSheet from './components/CharacterSheet';
 import Inventory from './components/Inventory';
 import QuestBoard from './components/QuestBoard';
+import Stats from './Stats';
 import PixelCharacter from './components/PixelCharacter';
 import AISettings from './components/AISettings';
 import CharacterManager from './components/CharacterManager';
-import { MapIcon, ScrollIcon, ShieldIcon, ChestIcon, QuestIcon } from './components/GameIcons';
+import ThemeSwitcher from './components/ThemeSwitcher';
+import TimeDisplay from './components/TimeDisplay';
+import Calendar from './components/Calendar';
+import { MapIcon, ScrollIcon, ShieldIcon, ChestIcon, QuestIcon, BarChartIcon } from './components/GameIcons';
 import { getCharacterFull, createCharacter } from './services/api';
 import type { CharacterFull } from './services/api';
 import './App.css';
@@ -22,6 +26,13 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [showAISettings, setShowAISettings] = useState(false);
   const [showCharacterManager, setShowCharacterManager] = useState(false);
+  const [showThemeSwitcher, setShowThemeSwitcher] = useState(false);
+
+  // 初始化主题
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('liferpg_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }, []);
 
   const loadCharacter = async () => {
     if (!characterId) {
@@ -88,6 +99,9 @@ function App() {
             <h1>LifeRPG</h1>
             <p className="subtitle">生活游戏化</p>
           </div>
+          <div className="sidebar-time">
+            <TimeDisplay size="small" showDate={true} showSeconds={false} />
+          </div>
           <div className="nav-links">
             <Link to="/" className="nav-link">
               <span className="icon"><MapIcon size={20} /></span>
@@ -109,6 +123,10 @@ function App() {
               <span className="icon"><QuestIcon size={20} /></span>
               任务板
             </Link>
+            <Link to="/stats" className="nav-link">
+              <span className="icon"><BarChartIcon size={20} /></span>
+              数据统计
+            </Link>
             <button 
               className="nav-link ai-settings-btn"
               onClick={() => setShowAISettings(true)}
@@ -116,6 +134,16 @@ function App() {
               <span className="icon">⚙️</span>
               AI 设置
             </button>
+            <button 
+              className="nav-link theme-btn"
+              onClick={() => setShowThemeSwitcher(true)}
+            >
+              <span className="icon"> </span>
+              主题设置
+            </button>
+          </div>
+          <div className="sidebar-calendar">
+            <Calendar />
           </div>
           <div className="character-mini">
             <div className="mini-avatar">
@@ -141,6 +169,7 @@ function App() {
             <Route path="/character" element={<CharacterSheet data={characterData} />} />
             <Route path="/inventory" element={<Inventory characterId={characterId} />} />
             <Route path="/quests" element={<QuestBoard characterId={characterId} onQuestComplete={handleRefresh} />} />
+            <Route path="/stats" element={<Stats characterId={characterId} />} />
           </Routes>
         </main>
       </div>
@@ -155,6 +184,9 @@ function App() {
           onCharacterCreated={handleCharacterCreated}
           onClose={() => setShowCharacterManager(false)}
         />
+      )}
+      {showThemeSwitcher && (
+        <ThemeSwitcher onClose={() => setShowThemeSwitcher(false)} />
       )}
     </Router>
   );

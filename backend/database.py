@@ -468,3 +468,220 @@ def complete_quest(quest_id: int) -> dict:
             (quest_id,)
         ).fetchone()
         return dict(row) if row else None
+
+
+# ============ 统计函数 ============
+
+def get_activity_stats(character_id: int) -> dict:
+    """获取活动统计数据"""
+    with get_db() as conn:
+        # 总活动次数
+        total_count = conn.execute(
+            "SELECT COUNT(*) as count FROM activity_logs WHERE character_id = ?",
+            (character_id,)
+        ).fetchone()["count"]
+        
+        # 今日活动次数
+        today = datetime.now().strftime("%Y-%m-%d")
+        today_count = conn.execute(
+            "SELECT COUNT(*) as count FROM activity_logs WHERE character_id = ? AND DATE(created_at) = ?",
+            (character_id, today)
+        ).fetchone()["count"]
+        
+        # 本周活动次数
+        week_ago = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
+        week_count = conn.execute(
+            "SELECT COUNT(*) as count FROM activity_logs WHERE character_id = ? AND DATE(created_at) >= ?",
+            (character_id, week_ago)
+        ).fetchone()["count"]
+        
+        # 总经验值和金币
+        totals = conn.execute(
+            "SELECT SUM(exp_gained) as total_exp, SUM(gold_gained) as total_gold FROM activity_logs WHERE character_id = ?",
+            (character_id,)
+        ).fetchone()
+        
+        # 活动类型统计
+        type_stats = conn.execute(
+            """SELECT activity_type, COUNT(*) as count 
+               FROM activity_logs WHERE character_id = ? 
+               GROUP BY activity_type ORDER BY count DESC""",
+            (character_id,)
+        ).fetchall()
+        
+        # 最常做的活动
+        most_common = type_stats[0]["activity_type"] if type_stats else "无"
+        
+        # 连续登录天数
+        consecutive_days = get_consecutive_days(character_id)
+        
+        return {
+            "total_count": total_count,
+            "today_count": today_count,
+            "week_count": week_count,
+            "total_exp": totals["total_exp"] or 0,
+            "total_gold": totals["total_gold"] or 0,
+            "type_stats": [dict(t) for t in type_stats],
+            "most_common": most_common,
+            "consecutive_days": consecutive_days
+        }
+
+
+def get_consecutive_days(character_id: int) -> int:
+    """获取连续登录天数"""
+    with get_db() as conn:
+        # 获取所有活动日期（去重）
+        dates = conn.execute(
+            """SELECT DISTINCT DATE(created_at) as date 
+               FROM activity_logs WHERE character_id = ? 
+               ORDER BY date DESC""",
+            (character_id,)
+        ).fetchall()
+        
+        if not dates:
+            return 0
+        
+        consecutive = 0
+        current_date = datetime.now().date()
+        
+        for row in dates:
+            activity_date = datetime.strptime(row["date"], "%Y-%m-%d").date()
+            if activity_date == current_date:
+                consecutive += 1
+                current_date -= timedelta(days=1)
+            elif activity_date == current_date - timedelta(days=1):
+                # 允许昨天没记录
+                current_date = activity_date
+                consecutive += 1
+            else:
+                break
+        
+        return consecutive
+
+
+def get_activity_history(character_id: int, days: int = 30) -> list:
+    """获取活动历史（按天统计）"""
+    with get_db() as conn:
+        start_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+        
+        history = conn.execute(
+            """SELECT DATE(created_at) as date, 
+                      COUNT(*) as count,
+                      SUM(exp_gained) as exp,
+                      SUM(gold_gained) as gold
+               FROM activity_logs 
+               WHERE character_id = ? AND DATE(created_at) >= ?
+               GROUP BY DATE(created_at)
+               ORDER BY date""",
+            (character_id, start_date)
+        ).fetchall()
+        
+        # 填充缺失的日期
+        result = []
+        current_date = datetime.now().date()
+        start = datetime.strptime(start_date, "%Y-%m-%d").date()
+        
+        history_dict = {row["date"]: dict(row) for row in history}
+        
+        while current_date >= start:
+            date_str = current_date.strftime("%Y-%m-%d")
+            if date_str in history_dict:
+                result.append(history_dict[date_str])
+            else:
+                result.append({
+                    "date": date_str,
+                    "count": 0,
+                    "exp": 0,
+                    "gold": 0
+                })
+            current_date -= timedelta(days=1)
+        
+        return result
+
+
+def get_attribute_history(character_id: int, days: int = 30) -> list:
+    """获取属性变化历史"""
+    with get_db() as conn:
+        start_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+        
+        # 获取属性变化记录
+        logs = conn.execute(
+            """SELECT attribute_changes, created_at
+               FROM activity_logs 
+               WHERE character_id = ? AND DATE(created_at) >= ?
+               ORDER BY created_at""",
+            (character_id, start_date)
+        ).fetchall()
+        
+        # 当前属性值
+        character = get_character(character_id)
+        if not character:
+            return []
+        
+        # 从当前属性反推历史
+        current_stats = {
+            "strength": character["strength"],
+            "intelligence": character["intelligence"],
+            "agility": character["agility"],
+            "charisma": character["charisma"],
+            "willpower": character["willpower"]
+        }
+        
+        # 收集所有变化
+        changes_by_date = {}
+        for log in logs:
+            date = datetime.strptime(log["created_at"], "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d") if log["created_at"] else None
+            if date and log["attribute_changes"]:
+                try:
+                    changes = json.loads(log["attribute_changes"])
+                    if date not in changes_by_date:
+                        changes_by_date[date] = {}
+                    for attr, value in changes.items():
+                        changes_by_date[date][attr] = changes_by_date[date].get(attr, 0) + value
+                except:
+                    pass
+        
+        # 生成历史数据
+        result = []
+        stats = current_stats.copy()
+        
+        current_date = datetime.now().date()
+        start = datetime.strptime(start_date, "%Y-%m-%d").date()
+        
+        while current_date >= start:
+            date_str = current_date.strftime("%Y-%m-%d")
+            
+            # 减去当天的变化
+            if date_str in changes_by_date:
+                for attr, value in changes_by_date[date_str].items():
+                    if attr in stats:
+                        stats[attr] -= value
+            
+            result.append({
+                "date": date_str,
+                **stats
+            })
+            
+            current_date -= timedelta(days=1)
+        
+        result.reverse()
+        return result
+
+
+def get_weekly_activity_type_stats(character_id: int) -> dict:
+    """获取本周各类型活动统计"""
+    with get_db() as conn:
+        # 获取本周的开始日期（周一）
+        today = datetime.now().date()
+        week_start = today - timedelta(days=today.weekday())
+        week_start_str = week_start.strftime("%Y-%m-%d")
+        
+        type_stats = conn.execute(
+            """SELECT activity_type, COUNT(*) as count
+               FROM activity_logs 
+               WHERE character_id = ? AND DATE(created_at) >= ?
+               GROUP BY activity_type""",
+            (character_id, week_start_str)
+        ).fetchall()
+        
+        return {row["activity_type"]: row["count"] for row in type_stats}

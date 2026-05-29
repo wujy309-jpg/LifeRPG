@@ -1,0 +1,186 @@
+.attribute-chart {
+  width: 100%;
+}
+
+.chart-empty {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* 属性卡片 */
+.attr-cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.attr-card {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.attr-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.attr-card-icon {
+  font-size: 24px;
+}
+
+.attr-card-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.attr-card-name {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.attr-card-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.attr-card-change {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.attr-card-change.positive {
+  color: var(--exp-green);
+  background: rgba(74, 222, 128, 0.1);
+}
+
+.attr-card-change.negative {
+  color: var(--hp-red);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* 属性曲线图 */
+.attr-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.attribute-line {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.attr-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.attr-icon {
+  font-size: 16px;
+}
+
+.attr-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.attr-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-gold);
+}
+
+.attr-change {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.attr-change.positive {
+  color: var(--exp-green);
+  background: rgba(74, 222, 128, 0.1);
+}
+
+.attr-change.negative {
+  color: var(--hp-red);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.attr-chart-container {
+  height: 60px;
+  width: 100%;
+}
+
+.attr-chart-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* 图例 */
+.attr-legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.legend-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .attr-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .attr-card {
+    padding: 12px;
+  }
+  
+  .attr-card-value {
+    font-size: 20px;
+  }
+  
+  .attr-legend {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .attr-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
