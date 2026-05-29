@@ -1,21 +1,30 @@
 .time-display {
   background: var(--bg-card);
   border: 1px solid var(--border-dark);
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 6px;
+  padding: 10px;
   text-align: center;
 }
 
 .time-display.small {
-  padding: 8px;
+  padding: 8px 10px;
 }
 
 .time-display.small .time-clock {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .time-display.small .time-date {
-  font-size: 11px;
+  font-size: 10px;
+}
+
+.time-display.small .time-period {
+  font-size: 10px;
+  margin-bottom: 4px;
+}
+
+.time-display.small .time-greeting {
+  font-size: 10px;
 }
 
 .time-display.medium {
@@ -35,9 +44,9 @@
 }
 
 .time-period {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,12 +54,12 @@
 }
 
 .time-clock {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--text-gold);
   font-family: 'Courier New', monospace;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
   text-shadow: 0 0 10px rgba(245, 197, 24, 0.3);
 }
 
@@ -62,13 +71,13 @@
 }
 
 .time-date {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--text-primary);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .time-greeting {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
   font-style: italic;
 }

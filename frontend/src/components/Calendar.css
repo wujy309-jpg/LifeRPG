@@ -2,7 +2,7 @@
   background: var(--bg-card);
   border: 1px solid var(--border-dark);
   border-radius: 8px;
-  padding: 16px;
+  padding: 12px;
   width: 100%;
   max-width: 320px;
 }
@@ -11,36 +11,36 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--border-dark);
 }
 
 .month-year {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 6px;
 }
 
 .month {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-gold);
 }
 
 .year {
-  font-size: 14px;
+  font-size: 11px;
   color: var(--text-secondary);
 }
 
 .nav-btn {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   background: var(--bg-dark);
   border: 1px solid var(--border-dark);
   border-radius: 4px;
   color: var(--text-primary);
-  font-size: 18px;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
@@ -56,23 +56,23 @@
 .calendar-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  margin-bottom: 8px;
+  gap: 2px;
+  margin-bottom: 4px;
 }
 
 .weekday {
   text-align: center;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
-  padding: 4px 0;
+  padding: 2px 0;
 }
 
 .calendar-days {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 2px;
 }
 
 .calendar-day {
@@ -81,11 +81,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
+  border-radius: 3px;
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
-  min-height: 36px;
+  min-height: 28px;
 }
 
 .calendar-day:hover:not(.empty) {
@@ -115,43 +115,58 @@
 }
 
 .day-number {
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .today-dot {
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   background: var(--gold);
   border-radius: 50%;
   position: absolute;
-  bottom: 4px;
+  bottom: 3px;
 }
 
 .calendar-footer {
-  margin-top: 12px;
-  padding-top: 12px;
+  margin-top: 8px;
+  padding-top: 8px;
   border-top: 1px solid var(--border-dark);
 }
 
 .today-btn {
   width: 100%;
-  padding: 8px;
+  padding: 6px;
   background: var(--bg-dark);
   border: 1px solid var(--border-dark);
   border-radius: 4px;
   color: var(--text-primary);
-  font-size: 12px;
+  font-size: 11px;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .today-btn:hover {
   background: var(--primary);
   border-color: var(--primary);
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 8px;
+  }
+  
+  .calendar-day {
+    min-height: 24px;
+  }
+  
+  .day-number {
+    font-size: 10px;
+  }
 }
