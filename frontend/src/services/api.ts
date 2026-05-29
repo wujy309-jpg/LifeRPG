@@ -168,6 +168,22 @@ export const getQuests = async (characterId: number, status?: string): Promise<Q
   return res.data;
 };
 
+export interface AllQuestsResponse {
+  available_quests: {
+    daily: Quest[];
+    weekly: Quest[];
+    challenge: Quest[];
+  };
+  active_quests: Quest[];
+  completed_today: number;
+  active_count: number;
+}
+
+export const getAllQuests = async (characterId: number): Promise<AllQuestsResponse> => {
+  const res = await api.get(`/quests/${characterId}/all`);
+  return res.data;
+};
+
 export const completeQuest = async (questId: number): Promise<any> => {
   const res = await api.post(`/quests/${questId}/complete`);
   return res.data;

@@ -17,7 +17,7 @@ from database import (
 from game_engine import (
     classify_activity, calculate_exp_gain, calculate_gold_gain,
     calculate_attribute_changes, check_level_up, generate_equipment,
-    generate_title, generate_quests, get_level_title, exp_for_level,
+    generate_title, generate_quests, generate_all_quests, get_level_title, exp_for_level,
     get_rarity_color, get_attribute_level, get_attribute_progress
 )
 from ai_service import (
@@ -399,6 +399,35 @@ async def api_get_titles(character_id: int):
 async def api_get_quests(character_id: int, status: str = None):
     """获取任务列表"""
     return get_quests(character_id, status)
+
+
+@app.get("/api/quests/{character_id}/all")
+async def api_get_all_quests(character_id: int):
+    """获取所有类型的任务"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    
+    stats = {
+        "strength": character["strength"],
+        "intelligence": character["intelligence"],
+        "agility": character["agility"],
+        "charisma": character["charisma"],
+        "willpower": character["willpower"]
+    }
+    
+    all_quests = generate_all_quests(character["level"], stats)
+    
+    # 获取当前活跃任务
+    active_quests = get_quests(character_id, status="active")
+    completed_quests = get_quests(character_id, status="completed")
+    
+    return {
+        "available_quests": all_quests,
+        "active_quests": active_quests,
+        "completed_today": len([q for q in completed_quests if q.get("created_at", "").startswith(date.today().isoformat())]),
+        "active_count": len(active_quests)
+    }
 
 
 @app.post("/api/quests/{quest_id}/complete")

@@ -580,7 +580,9 @@ def generate_title(
 
 # ============ 任务系统 ============
 
+# 每日任务池
 DAILY_QUESTS = [
+    # 学习类
     {
         "title": "今日学习任务",
         "description": "学习30分钟，阅读一本书的章节",
@@ -590,6 +592,32 @@ DAILY_QUESTS = [
         "target_attr": "intelligence"
     },
     {
+        "title": "知识探索",
+        "description": "学习一个新知识点或技能",
+        "quest_type": "daily",
+        "exp_base": 35,
+        "gold_base": 12,
+        "target_attr": "intelligence"
+    },
+    {
+        "title": "复习巩固",
+        "description": "复习之前学过的内容，加深记忆",
+        "quest_type": "daily",
+        "exp_base": 25,
+        "gold_base": 8,
+        "target_attr": "intelligence"
+    },
+    {
+        "title": "阅读时光",
+        "description": "阅读30分钟书籍或文章",
+        "quest_type": "daily",
+        "exp_base": 28,
+        "gold_base": 10,
+        "target_attr": "intelligence"
+    },
+    
+    # 运动类
+    {
         "title": "运动挑战",
         "description": "完成20分钟的有氧运动",
         "quest_type": "daily",
@@ -597,6 +625,32 @@ DAILY_QUESTS = [
         "gold_base": 12,
         "target_attr": "strength"
     },
+    {
+        "title": "晨间锻炼",
+        "description": "早起做10分钟拉伸运动",
+        "quest_type": "daily",
+        "exp_base": 25,
+        "gold_base": 8,
+        "target_attr": "agility"
+    },
+    {
+        "title": "步行挑战",
+        "description": "步行至少30分钟或6000步",
+        "quest_type": "daily",
+        "exp_base": 30,
+        "gold_base": 10,
+        "target_attr": "strength"
+    },
+    {
+        "title": "核心训练",
+        "description": "做3组平板支撑或仰卧起坐",
+        "quest_type": "daily",
+        "exp_base": 32,
+        "gold_base": 11,
+        "target_attr": "strength"
+    },
+    
+    # 编程类
     {
         "title": "代码练习",
         "description": "解决一道算法题或写一个小项目",
@@ -606,6 +660,24 @@ DAILY_QUESTS = [
         "target_attr": "intelligence"
     },
     {
+        "title": "代码重构",
+        "description": "优化一段旧代码，提升代码质量",
+        "quest_type": "daily",
+        "exp_base": 35,
+        "gold_base": 12,
+        "target_attr": "intelligence"
+    },
+    {
+        "title": "技术学习",
+        "description": "学习一个新的框架或工具",
+        "quest_type": "daily",
+        "exp_base": 38,
+        "gold_base": 14,
+        "target_attr": "intelligence"
+    },
+    
+    # 社交类
+    {
         "title": "社交任务",
         "description": "和一个朋友聊天或帮助一个人",
         "quest_type": "daily",
@@ -613,6 +685,24 @@ DAILY_QUESTS = [
         "gold_base": 8,
         "target_attr": "charisma"
     },
+    {
+        "title": "感恩表达",
+        "description": "向一个人表达感谢或赞美",
+        "quest_type": "daily",
+        "exp_base": 18,
+        "gold_base": 7,
+        "target_attr": "charisma"
+    },
+    {
+        "title": "倾听时刻",
+        "description": "认真倾听一个人的烦恼或故事",
+        "quest_type": "daily",
+        "exp_base": 22,
+        "gold_base": 9,
+        "target_attr": "charisma"
+    },
+    
+    # 生活类
     {
         "title": "生活整理",
         "description": "整理房间或做一顿健康的饭菜",
@@ -622,6 +712,32 @@ DAILY_QUESTS = [
         "target_attr": "willpower"
     },
     {
+        "title": "健康饮食",
+        "description": "吃一顿营养均衡的饭菜",
+        "quest_type": "daily",
+        "exp_base": 12,
+        "gold_base": 4,
+        "target_attr": "willpower"
+    },
+    {
+        "title": "早睡早起",
+        "description": "今晚11点前睡觉",
+        "quest_type": "daily",
+        "exp_base": 20,
+        "gold_base": 8,
+        "target_attr": "willpower"
+    },
+    {
+        "title": "断网时光",
+        "description": "放下手机1小时，专注做一件事",
+        "quest_type": "daily",
+        "exp_base": 25,
+        "gold_base": 10,
+        "target_attr": "willpower"
+    },
+    
+    # 创意类
+    {
         "title": "创意挑战",
         "description": "写一篇文章或画一幅画",
         "quest_type": "daily",
@@ -629,19 +745,268 @@ DAILY_QUESTS = [
         "gold_base": 12,
         "target_attr": "intelligence"
     },
+    {
+        "title": "摄影练习",
+        "description": "拍摄3张有创意的照片",
+        "quest_type": "daily",
+        "exp_base": 22,
+        "gold_base": 8,
+        "target_attr": "charisma"
+    },
+    {
+        "title": "音乐时光",
+        "description": "练习乐器或学习一首新歌",
+        "quest_type": "daily",
+        "exp_base": 28,
+        "gold_base": 10,
+        "target_attr": "agility"
+    },
+    
+    # 冥想放松类
+    {
+        "title": "冥想练习",
+        "description": "冥想10分钟，放松身心",
+        "quest_type": "daily",
+        "exp_base": 18,
+        "gold_base": 6,
+        "target_attr": "willpower"
+    },
+    {
+        "title": "深呼吸",
+        "description": "做5分钟深呼吸练习",
+        "quest_type": "daily",
+        "exp_base": 12,
+        "gold_base": 4,
+        "target_attr": "willpower"
+    },
+]
+
+# 每周任务池
+WEEKLY_QUESTS = [
+    {
+        "title": "周运动目标",
+        "description": "本周运动3次，每次30分钟以上",
+        "quest_type": "weekly",
+        "exp_base": 150,
+        "gold_base": 50,
+        "target_attr": "strength"
+    },
+    {
+        "title": "阅读一本书",
+        "description": "本周读完一本书",
+        "quest_type": "weekly",
+        "exp_base": 180,
+        "gold_base": 60,
+        "target_attr": "intelligence"
+    },
+    {
+        "title": "社交达人",
+        "description": "本周参加一次社交活动",
+        "quest_type": "weekly",
+        "exp_base": 120,
+        "gold_base": 40,
+        "target_attr": "charisma"
+    },
+    {
+        "title": "技能提升",
+        "description": "本周学习一个新技能或完成一个项目",
+        "quest_type": "weekly",
+        "exp_base": 200,
+        "gold_base": 70,
+        "target_attr": "intelligence"
+    },
+    {
+        "title": "生活习惯",
+        "description": "本周坚持早睡早起5天",
+        "quest_type": "weekly",
+        "exp_base": 160,
+        "gold_base": 55,
+        "target_attr": "willpower"
+    },
+    {
+        "title": "创意周",
+        "description": "本周完成一个创意作品",
+        "quest_type": "weekly",
+        "exp_base": 170,
+        "gold_base": 58,
+        "target_attr": "charisma"
+    },
+    {
+        "title": "健康饮食周",
+        "description": "本周自己做饭至少3次",
+        "quest_type": "weekly",
+        "exp_base": 140,
+        "gold_base": 45,
+        "target_attr": "willpower"
+    },
+    {
+        "title": "整理大师",
+        "description": "本周彻底整理一次房间",
+        "quest_type": "weekly",
+        "exp_base": 130,
+        "gold_base": 42,
+        "target_attr": "willpower"
+    },
+]
+
+# 挑战任务池（难度较高，奖励丰厚）
+CHALLENGE_QUESTS = [
+    {
+        "title": "马拉松挑战",
+        "description": "连续跑步5公里",
+        "quest_type": "challenge",
+        "exp_base": 300,
+        "gold_base": 100,
+        "target_attr": "strength"
+    },
+    {
+        "title": "编程马拉松",
+        "description": "连续编程4小时完成一个项目",
+        "quest_type": "challenge",
+        "exp_base": 350,
+        "gold_base": 120,
+        "target_attr": "intelligence"
+    },
+    {
+        "title": "社交达人挑战",
+        "description": "一天内和5个不同的人交流",
+        "quest_type": "challenge",
+        "exp_base": 250,
+        "gold_base": 85,
+        "target_attr": "charisma"
+    },
+    {
+        "title": "极限专注",
+        "description": "连续专注工作/学习2小时不休息",
+        "quest_type": "challenge",
+        "exp_base": 280,
+        "gold_base": 95,
+        "target_attr": "willpower"
+    },
+    {
+        "title": "全能挑战",
+        "description": "今天完成学习、运动、社交各一项",
+        "quest_type": "challenge",
+        "exp_base": 320,
+        "gold_base": 110,
+        "target_attr": "agility"
+    },
+    {
+        "title": "早起挑战",
+        "description": "连续3天早上6点前起床",
+        "quest_type": "challenge",
+        "exp_base": 260,
+        "gold_base": 88,
+        "target_attr": "willpower"
+    },
+    {
+        "title": "阅读马拉松",
+        "description": "连续阅读2小时",
+        "quest_type": "challenge",
+        "exp_base": 270,
+        "gold_base": 90,
+        "target_attr": "intelligence"
+    },
+    {
+        "title": "厨艺挑战",
+        "description": "做一道从没做过的菜",
+        "quest_type": "challenge",
+        "exp_base": 240,
+        "gold_base": 80,
+        "target_attr": "agility"
+    },
+]
+
+# 成就任务（一次性完成）
+ACHIEVEMENT_QUESTS = [
+    {
+        "title": "初次冒险",
+        "description": "完成第一次活动记录",
+        "quest_type": "achievement",
+        "exp_base": 50,
+        "gold_base": 20,
+        "target_attr": None
+    },
+    {
+        "title": "连续三天",
+        "description": "连续3天记录活动",
+        "quest_type": "achievement",
+        "exp_base": 100,
+        "gold_base": 35,
+        "target_attr": "willpower"
+    },
+    {
+        "title": "一周坚持",
+        "description": "连续7天记录活动",
+        "quest_type": "achievement",
+        "exp_base": 250,
+        "gold_base": 80,
+        "target_attr": "willpower"
+    },
+    {
+        "title": "百次记录",
+        "description": "累计记录100次活动",
+        "quest_type": "achievement",
+        "exp_base": 500,
+        "gold_base": 150,
+        "target_attr": "willpower"
+    },
+    {
+        "title": "属性大师",
+        "description": "任意一项属性达到20",
+        "quest_type": "achievement",
+        "exp_base": 300,
+        "gold_base": 100,
+        "target_attr": None
+    },
+    {
+        "title": "全能战士",
+        "description": "所有属性都达到15",
+        "quest_type": "achievement",
+        "exp_base": 400,
+        "gold_base": 130,
+        "target_attr": None
+    },
+    {
+        "title": "装备收藏家",
+        "description": "收集10件装备",
+        "quest_type": "achievement",
+        "exp_base": 200,
+        "gold_base": 65,
+        "target_attr": None
+    },
+    {
+        "title": "称号达人",
+        "description": "获得5个称号",
+        "quest_type": "achievement",
+        "exp_base": 180,
+        "gold_base": 60,
+        "target_attr": None
+    },
 ]
 
 
-def generate_quests(character_level: int, character_stats: Dict[str, int]) -> List[Dict]:
-    """生成每日任务（3个）"""
+def generate_quests(character_level: int, character_stats: Dict[str, int], quest_type: str = "daily") -> List[Dict]:
+    """生成任务"""
     # 找出最弱属性
     weakest_attr = min(character_stats, key=character_stats.get)
     
-    # 优先推荐针对最弱属性的任务
-    priority_quests = [q for q in DAILY_QUESTS if q["target_attr"] == weakest_attr]
-    other_quests = [q for q in DAILY_QUESTS if q["target_attr"] != weakest_attr]
+    # 根据任务类型选择任务池
+    if quest_type == "weekly":
+        quest_pool = WEEKLY_QUESTS
+        quest_count = 2  # 每周任务2个
+    elif quest_type == "challenge":
+        quest_pool = CHALLENGE_QUESTS
+        quest_count = 1  # 挑战任务1个
+    else:
+        quest_pool = DAILY_QUESTS
+        quest_count = 3  # 每日任务3个
     
-    # 选择3个任务
+    # 优先推荐针对最弱属性的任务
+    priority_quests = [q for q in quest_pool if q.get("target_attr") == weakest_attr]
+    other_quests = [q for q in quest_pool if q.get("target_attr") != weakest_attr]
+    
+    # 选择任务
     selected = []
     
     # 至少一个针对最弱属性的任务
@@ -650,7 +1015,7 @@ def generate_quests(character_level: int, character_stats: Dict[str, int]) -> Li
     
     # 填充剩余位置
     random.shuffle(other_quests)
-    while len(selected) < 3 and other_quests:
+    while len(selected) < quest_count and other_quests:
         quest = other_quests.pop()
         if quest not in selected:
             selected.append(quest)
@@ -658,15 +1023,32 @@ def generate_quests(character_level: int, character_stats: Dict[str, int]) -> Li
     # 计算奖励（基于等级）
     result = []
     for quest in selected:
+        # 不同类型任务的奖励倍率
+        multiplier = {
+            "daily": 1,
+            "weekly": 1.5,
+            "challenge": 2,
+            "achievement": 1
+        }.get(quest.get("quest_type", "daily"), 1)
+        
         result.append({
             "title": quest["title"],
             "description": quest["description"],
-            "quest_type": quest["quest_type"],
-            "exp_reward": quest["exp_base"] + character_level * 5,
-            "gold_reward": quest["gold_base"] + character_level * 2,
+            "quest_type": quest.get("quest_type", "daily"),
+            "exp_reward": int((quest["exp_base"] + character_level * 5) * multiplier),
+            "gold_reward": int((quest["gold_base"] + character_level * 2) * multiplier),
         })
     
     return result
+
+
+def generate_all_quests(character_level: int, character_stats: Dict[str, int]) -> Dict[str, List[Dict]]:
+    """生成所有类型的任务"""
+    return {
+        "daily": generate_quests(character_level, character_stats, "daily"),
+        "weekly": generate_quests(character_level, character_stats, "weekly"),
+        "challenge": generate_quests(character_level, character_stats, "challenge"),
+    }
 
 
 # ============ 装备效果 ============
