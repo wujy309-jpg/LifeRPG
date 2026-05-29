@@ -1,0 +1,384 @@
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ========== 侧边栏 - 游戏导航风格 ========== */
+.sidebar {
+  width: 260px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-dark);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  z-index: 100;
+}
+
+/* 侧边栏顶部装饰 */
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -1px;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, var(--gold) 0%, transparent 30%, transparent 70%, var(--gold) 100%);
+}
+
+.logo {
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--border-dark);
+  position: relative;
+  background: linear-gradient(180deg, rgba(245, 197, 24, 0.05) 0%, transparent 100%);
+}
+
+.logo h1 {
+  font-size: 28px;
+  background: linear-gradient(135deg, var(--gold), #ffd700);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 20px rgba(245, 197, 24, 0.3);
+  letter-spacing: 2px;
+}
+
+.logo .subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+/* 导航链接 */
+.nav-links {
+  flex: 1;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.2s;
+  position: relative;
+  border: 1px solid transparent;
+}
+
+.nav-link:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border-dark);
+}
+
+.nav-link:hover::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--gold);
+  border-radius: 0 2px 2px 0;
+}
+
+.nav-link .icon {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+}
+
+/* 角色迷你信息 */
+.character-mini {
+  padding: 20px;
+  border-top: 1px solid var(--border-dark);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(180deg, transparent 0%, rgba(245, 197, 24, 0.03) 100%);
+}
+
+.mini-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 4px;
+  background: var(--bg-darkest);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--border-dark);
+  position: relative;
+  overflow: hidden;
+}
+
+.mini-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  opacity: 0.3;
+}
+
+.mini-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mini-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mini-level {
+  font-size: 12px;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mini-level::before {
+  content: '★';
+  font-size: 10px;
+}
+
+/* ========== 主内容区 ========== */
+.content {
+  flex: 1;
+  margin-left: 260px;
+  padding: 24px 32px;
+  min-height: 100vh;
+  background: var(--bg-dark);
+}
+
+/* ========== 欢迎界面 - 游戏开始画面 ========== */
+.welcome-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: 
+    radial-gradient(ellipse at center, rgba(99, 102, 241, 0.15) 0%, transparent 60%),
+    var(--bg-darkest);
+}
+
+.welcome-content {
+  text-align: center;
+  max-width: 500px;
+  padding: 48px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  position: relative;
+}
+
+.welcome-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.welcome-title {
+  font-size: 72px;
+  background: linear-gradient(135deg, var(--gold), #ffd700, var(--gold));
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s ease-in-out infinite;
+  margin-bottom: 8px;
+  letter-spacing: 4px;
+}
+
+.welcome-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+}
+
+.welcome-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 4px;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.feature:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.feature-icon {
+  font-size: 22px;
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.name-input {
+  padding: 16px 20px;
+  border: 1px solid var(--border-dark);
+  border-radius: 4px;
+  background: var(--bg-darkest);
+  color: var(--text-primary);
+  font-size: 16px;
+  outline: none;
+  transition: all 0.2s;
+  text-align: center;
+  letter-spacing: 2px;
+}
+
+.name-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 15px var(--border-glow);
+}
+
+.name-input::placeholder {
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+}
+
+.create-btn {
+  padding: 16px 32px;
+  background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.create-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
+}
+
+.create-btn:hover::before {
+  left: 100%;
+}
+
+.create-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(245, 197, 24, 0.4);
+}
+
+.create-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ========== 通用页面头部 ========== */
+.page-header {
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-dark);
+  position: relative;
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100px;
+  height: 2px;
+  background: var(--gold);
+}
+
+.page-header h2 {
+  font-size: 24px;
+  color: var(--text-primary);
+  letter-spacing: 1px;
+}
+
+.page-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+/* ========== AI设置按钮 ========== */
+.ai-settings-btn {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  margin-top: auto;
+  position: relative;
+}
+
+.ai-settings-btn::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-dark), transparent);
+}
+
+.ai-settings-btn:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border-dark);
+}
+
+.ai-settings-btn:hover::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--secondary);
+  border-radius: 0 2px 2px 0;
+}

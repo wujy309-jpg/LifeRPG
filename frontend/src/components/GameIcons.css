@@ -1,0 +1,43 @@
+.game-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.game-icon img {
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.game-icon:hover img {
+  transform: scale(1.1);
+}
+
+/* 图标发光效果 */
+.game-icon.glow img {
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+/* 图标动画 */
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.game-icon.animate img {
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+/* 属性图标颜色 */
+.stat-icon-strength { color: #ff6b6b; }
+.stat-icon-intelligence { color: #4ecdc4; }
+.stat-icon-agility { color: #45b7d1; }
+.stat-icon-charisma { color: #f9ca24; }
+.stat-icon-willpower { color: #a55eea; }
+
+/* 稀有度发光 */
+.rarity-common img { filter: drop-shadow(0 0 2px #9d9d9d); }
+.rarity-rare img { filter: drop-shadow(0 0 4px #0070dd); }
+.rarity-epic img { filter: drop-shadow(0 0 6px #a335ee); }
+.rarity-legendary img { filter: drop-shadow(0 0 8px #ff8000); }

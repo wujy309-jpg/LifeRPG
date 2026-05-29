@@ -1,0 +1,262 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  /* 游戏主题色 */
+  --gold: #f5c518;
+  --gold-dark: #c9a400;
+  --exp-green: #4ade80;
+  --hp-red: #ef4444;
+  --mp-blue: #3b82f6;
+  --mana-purple: #a855f7;
+  
+  /* 暗黑风格背景 */
+  --bg-darkest: #0a0a0f;
+  --bg-dark: #111118;
+  --bg-card: #1a1a24;
+  --bg-card-hover: #222233;
+  --bg-sidebar: #0f0f18;
+  
+  /* 边框和装饰 */
+  --border-dark: #2a2a3a;
+  --border-gold: #c9a40040;
+  --border-glow: #f5c51820;
+  
+  /* 文字 */
+  --text-primary: #e8e8f0;
+  --text-secondary: #8888a0;
+  --text-gold: #f5c518;
+  
+  /* 主色调 */
+  --primary: #6366f1;
+  --primary-glow: #6366f140;
+  --secondary: #22d3ee;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  background: var(--bg-darkest);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 背景纹理 */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(34, 211, 238, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(245, 197, 24, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-darkest);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-dark);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* 游戏边框样式 */
+.game-border {
+  border: 1px solid var(--border-dark);
+  position: relative;
+}
+
+.game-border::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
+}
+
+.game-border::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 10px;
+  right: 10px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
+}
+
+/* 游戏卡片 */
+.game-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dark);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.game-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.5;
+}
+
+/* 游戏按钮 */
+.game-btn {
+  padding: 10px 20px;
+  background: linear-gradient(180deg, var(--bg-card-hover) 0%, var(--bg-card) 100%);
+  border: 1px solid var(--border-dark);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.game-btn:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px var(--border-glow);
+}
+
+.game-btn:active {
+  transform: translateY(1px);
+}
+
+.game-btn.primary {
+  background: linear-gradient(180deg, var(--primary) 0%, #4f46e5 100%);
+  border-color: var(--primary);
+}
+
+.game-btn.primary:hover {
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
+/* HP/MP/EXP 条 */
+.bar-container {
+  height: 20px;
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-dark);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+}
+
+.bar-fill.hp {
+  background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.bar-fill.mp {
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+}
+
+.bar-fill.exp {
+  background: linear-gradient(90deg, #059669, #10b981);
+}
+
+.bar-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  z-index: 1;
+}
+
+/* 加载动画 */
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-dark);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 闪光效果 */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* 脉冲效果 */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* 浮动效果 */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* 像素化文字（用于标题） */
+.pixel-text {
+  font-family: 'Press Start 2P', cursive;
+  image-rendering: pixelated;
+}

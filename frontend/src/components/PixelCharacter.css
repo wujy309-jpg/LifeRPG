@@ -1,0 +1,67 @@
+.pixel-character {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  display: block;
+}
+
+.pixel-character-container {
+  position: relative;
+  display: inline-block;
+}
+
+.pixel-character-shadow {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  filter: blur(2px);
+}
+
+/* 像素小人动画 */
+@keyframes pixelBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes pixelIdle {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.98);
+  }
+}
+
+.pixel-character.animated {
+  animation: pixelBounce 0.6s ease-in-out infinite;
+}
+
+.pixel-character.idle {
+  animation: pixelIdle 2s ease-in-out infinite;
+}
+
+/* 像素边框效果 */
+.pixel-character.bordered {
+  border: 2px solid var(--border-dark);
+  border-radius: 4px;
+  padding: 2px;
+  background: var(--bg-darkest);
+}
+
+/* 发光效果 */
+.pixel-character.glow {
+  filter: drop-shadow(0 0 8px var(--primary));
+}
+
+.pixel-character.glow-gold {
+  filter: drop-shadow(0 0 8px var(--gold));
+}

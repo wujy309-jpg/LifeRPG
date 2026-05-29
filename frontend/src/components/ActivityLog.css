@@ -1,0 +1,278 @@
+.activity-page {
+  max-width: 800px;
+}
+
+.page-header {
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-dark);
+  position: relative;
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100px;
+  height: 2px;
+  background: var(--gold);
+}
+
+.page-header h2 {
+  font-size: 24px;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.page-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* ========== 输入区域 ========== */
+.input-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dark);
+  border-radius: 4px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+
+.activity-input {
+  width: 100%;
+  padding: 18px;
+  border: 1px solid var(--border-dark);
+  border-radius: 4px;
+  background: var(--bg-darkest);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.activity-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 15px var(--border-glow);
+}
+
+.activity-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.submit-btn {
+  width: 100%;
+  margin-top: 18px;
+  padding: 16px;
+  background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dark) 100%);
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(245, 197, 24, 0.4);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========== 预设区域 ========== */
+.presets-section {
+  margin-bottom: 24px;
+}
+
+.presets-section h3 {
+  margin-bottom: 18px;
+  font-size: 16px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+.presets-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.preset-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-dark);
+  border-radius: 4px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.preset-btn:hover {
+  border-color: var(--gold);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(245, 197, 24, 0.2);
+}
+
+.preset-icon {
+  font-size: 28px;
+}
+
+.preset-label {
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+/* ========== 反馈区域 ========== */
+.feedback-section {
+  margin-top: 28px;
+}
+
+.feedback-section h3 {
+  margin-bottom: 18px;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+.feedback-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-dark);
+  border-radius: 4px;
+  padding: 28px;
+}
+
+.gains-row {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  margin-bottom: 28px;
+}
+
+.gain-item {
+  text-align: center;
+  padding: 20px 28px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 4px;
+}
+
+.gain-icon {
+  display: block;
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.gain-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.gain-value {
+  font-size: 32px;
+  font-weight: bold;
+  font-family: monospace;
+}
+
+.gain-item.exp .gain-value {
+  color: var(--exp-green);
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+}
+
+.gain-item.gold .gain-value {
+  color: var(--gold);
+  text-shadow: 0 0 10px rgba(245, 197, 24, 0.3);
+}
+
+.level-up-alert {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  padding: 16px 20px;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #000;
+  font-size: 18px;
+  letter-spacing: 2px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.reward-card {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  border-left: 3px solid;
+  padding: 18px;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 14px;
+}
+
+.reward-card h4 {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.reward-name {
+  font-size: 17px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.reward-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.quest-rewards {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.quest-rewards span {
+  font-size: 12px;
+  padding: 5px 12px;
+  background: var(--bg-card);
+  border-radius: 2px;
+  color: var(--exp-green);
+  font-weight: 600;
+}
+
+.ai-comment-box {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 4px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.comment-label {
+  font-size: 11px;
+  color: var(--gold);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.comment-content {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}

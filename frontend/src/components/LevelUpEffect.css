@@ -1,0 +1,271 @@
+.level-up-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease-out;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 粒子效果 */
+.particles-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: linear-gradient(135deg, #ffd700, #ff6b6b);
+  border-radius: 50%;
+  animation: particleFloat 2s ease-out forwards;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--random-x, 50px) - 25px), -150px) scale(0);
+    opacity: 0;
+  }
+}
+
+.particle:nth-child(odd) {
+  --random-x: 80px;
+  background: linear-gradient(135deg, #00cec9, #6c5ce7);
+}
+
+.particle:nth-child(3n) {
+  --random-x: -60px;
+  background: linear-gradient(135deg, #ffd700, #ff9ff3);
+}
+
+/* 主内容 */
+.level-up-content {
+  position: relative;
+  text-align: center;
+  animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 光环效果 */
+.glow-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  animation: pulseRing 2s ease-out infinite;
+}
+
+.glow-ring.delay-1 {
+  animation-delay: 0.3s;
+  width: 350px;
+  height: 350px;
+}
+
+.glow-ring.delay-2 {
+  animation-delay: 0.6s;
+  width: 400px;
+  height: 400px;
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* 升级文字 */
+.level-up-text {
+  margin-bottom: 20px;
+}
+
+.level-up-label {
+  font-size: 48px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffd700, #ff6b6b, #ffd700);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 2s ease-in-out infinite;
+  text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+  letter-spacing: 8px;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* 等级徽章 */
+.new-level-container {
+  margin: 30px 0;
+}
+
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #6c5ce7, #00cec9);
+  border-radius: 50%;
+  position: relative;
+  animation: rotateIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.level-badge::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffd700, #ff6b6b, #ffd700);
+  z-index: -1;
+  animation: rotate 3s linear infinite;
+}
+
+@keyframes rotateIn {
+  from {
+    transform: rotate(-180deg) scale(0);
+  }
+  to {
+    transform: rotate(0) scale(1);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.level-number {
+  font-size: 56px;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* 恭喜文字 */
+.congrats-text {
+  margin: 20px 0;
+  animation: slideUp 0.5s ease-out 0.3s both;
+}
+
+.congrats-text p {
+  font-size: 24px;
+  color: white;
+  margin: 8px 0;
+}
+
+.congrats-text .highlight {
+  color: #ffd700;
+  font-weight: bold;
+}
+
+.congrats-text .subtitle {
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 奖励容器 */
+.rewards-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 25px 0;
+  animation: slideUp 0.5s ease-out 0.5s both;
+}
+
+.reward-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.reward-icon {
+  font-size: 24px;
+}
+
+.reward-text {
+  font-size: 16px;
+  color: white;
+  font-weight: 600;
+}
+
+/* 关闭提示 */
+.close-hint {
+  margin-top: 30px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  opacity: 0.7;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}

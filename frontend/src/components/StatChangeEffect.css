@@ -1,0 +1,126 @@
+.stat-change-overlay {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1500;
+  animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.stat-change-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  min-width: 280px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.stat-change-title {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  text-align: center;
+  font-weight: normal;
+}
+
+.stat-changes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stat-change-item {
+  padding: 12px;
+  background: var(--bg-dark);
+  border-radius: 8px;
+}
+
+.stat-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.stat-icon {
+  font-size: 18px;
+}
+
+.stat-name {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.stat-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.stat-values {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.old-value {
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+.arrow {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.new-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.gain-badge {
+  padding: 4px 10px;
+  background: linear-gradient(135deg, var(--exp), #00d2d3);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  animation: pulseBadge 1s ease-in-out infinite;
+}
+
+@keyframes pulseBadge {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.stat-bar-container {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 3px;
+  transition: width 0.8s ease-out;
+}
