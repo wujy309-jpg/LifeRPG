@@ -25,6 +25,36 @@ def load_config() -> dict:
                 "base_url": "http://localhost:11434",
                 "model": "gemma4:latest",
                 "api_key": None
+            },
+            "openai": {
+                "name": "OpenAI",
+                "base_url": "https://api.openai.com/v1",
+                "model": "gpt-3.5-turbo",
+                "api_key": None
+            },
+            "claude": {
+                "name": "Claude",
+                "base_url": "https://api.anthropic.com/v1",
+                "model": "claude-3-sonnet-20240229",
+                "api_key": None
+            },
+            "deepseek": {
+                "name": "DeepSeek",
+                "base_url": "https://api.deepseek.com/v1",
+                "model": "deepseek-chat",
+                "api_key": None
+            },
+            "mimo": {
+                "name": "MiMo v2.5 Pro",
+                "base_url": "https://api.xiaoai.mi.com/v1",
+                "model": "mimo-v2.5-pro",
+                "api_key": None
+            },
+            "custom": {
+                "name": "自定义",
+                "base_url": "",
+                "model": "",
+                "api_key": None
             }
         }
     }

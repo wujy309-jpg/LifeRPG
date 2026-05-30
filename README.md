@@ -57,7 +57,12 @@
    cd LifeRPG
    ```
 
-2. 运行安装脚本：
+2. 复制配置文件：
+   ```bash
+   copy backend\config.example.json backend\config.json
+   ```
+
+3. 运行安装脚本：
    ```bash
    install.bat
    ```
