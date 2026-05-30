@@ -12,6 +12,7 @@ import CharacterManager from './components/CharacterManager';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import TimeDisplay from './components/TimeDisplay';
 import Calendar from './components/Calendar';
+import RealityShop from './components/RealityShop';
 import { MapIcon, ScrollIcon, ShieldIcon, ChestIcon, QuestIcon, BarChartIcon } from './components/GameIcons';
 import { getCharacterFull, createCharacter } from './services/api';
 import type { CharacterFull } from './services/api';
@@ -123,6 +124,10 @@ function App() {
               <span className="icon"><QuestIcon size={20} /></span>
               任务板
             </Link>
+            <Link to="/reality" className="nav-link">
+              <span className="icon"> </span>
+              现实商城
+            </Link>
             <Link to="/stats" className="nav-link">
               <span className="icon"><BarChartIcon size={20} /></span>
               数据统计
@@ -169,6 +174,7 @@ function App() {
             <Route path="/character" element={<CharacterSheet data={characterData} />} />
             <Route path="/inventory" element={<Inventory characterId={characterId} />} />
             <Route path="/quests" element={<QuestBoard characterId={characterId} onQuestComplete={handleRefresh} />} />
+            <Route path="/reality" element={<RealityShop characterId={characterId} onRefresh={handleRefresh} />} />
             <Route path="/stats" element={<Stats characterId={characterId} />} />
           </Routes>
         </main>

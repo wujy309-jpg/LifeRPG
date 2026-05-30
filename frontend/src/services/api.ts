@@ -282,4 +282,95 @@ export const testAIConnection = async (providerName: string): Promise<any> => {
   return res.data;
 };
 
+
+// ==================== 现实连接 API ====================
+
+export interface RealityReward {
+  id: number;
+  character_id: number;
+  name: string;
+  description: string;
+  category: string;
+  cost: number;
+  icon: string;
+  is_custom: boolean;
+  times_redeemed: number;
+}
+
+export interface HabitChallenge {
+  id: number;
+  character_id: number;
+  name: string;
+  description: string;
+  duration_days: number;
+  cost: number;
+  reward_exp: number;
+  reward_gold: number;
+  status: string;
+  start_date: string;
+  end_date: string;
+  check_in_days: number;
+  last_check_in: string;
+}
+
+export interface ImmunityCard {
+  id: number;
+  character_id: number;
+  name: string;
+  description: string;
+  cost: number;
+  uses_remaining: number;
+  card_type: string;
+}
+
+export const getRealityRewards = async (characterId: number): Promise<{rewards: RealityReward[], gold: number}> => {
+  const res = await api.get(`/reality/rewards/${characterId}`);
+  return res.data;
+};
+
+export const addCustomReward = async (characterId: number, data: {name: string, description?: string, cost: number}): Promise<any> => {
+  const res = await api.post(`/reality/rewards/${characterId}/add`, data);
+  return res.data;
+};
+
+export const redeemReward = async (characterId: number, rewardId: number): Promise<any> => {
+  const res = await api.post(`/reality/rewards/${characterId}/redeem/${rewardId}`);
+  return res.data;
+};
+
+export const getHabitChallenges = async (characterId: number): Promise<{challenges: HabitChallenge[], gold: number}> => {
+  const res = await api.get(`/reality/challenges/${characterId}`);
+  return res.data;
+};
+
+export const createHabitChallenge = async (characterId: number, data: {name: string, description?: string, duration_days?: number, cost?: number}): Promise<any> => {
+  const res = await api.post(`/reality/challenges/${characterId}/create`, data);
+  return res.data;
+};
+
+export const checkInChallenge = async (characterId: number, challengeId: number): Promise<any> => {
+  const res = await api.post(`/reality/challenges/${challengeId}/checkin/${characterId}`);
+  return res.data;
+};
+
+export const getImmunityCards = async (characterId: number): Promise<{cards: ImmunityCard[], gold: number}> => {
+  const res = await api.get(`/reality/cards/${characterId}`);
+  return res.data;
+};
+
+export const buyImmunityCard = async (characterId: number, cardType: string): Promise<any> => {
+  const res = await api.post(`/reality/cards/${characterId}/buy`, {card_type: cardType});
+  return res.data;
+};
+
+export const checkPenalty = async (characterId: number): Promise<any> => {
+  const res = await api.get(`/reality/penalty/${characterId}`);
+  return res.data;
+};
+
+export const getPenaltyHistory = async (characterId: number): Promise<any> => {
+  const res = await api.get(`/reality/penalty/${characterId}/history`);
+  return res.data;
+};
+
 export default api;

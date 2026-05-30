@@ -690,3 +690,311 @@ def get_weekly_activity_type_stats(character_id: int) -> dict:
         ).fetchall()
         
         return {row["activity_type"]: row["count"] for row in type_stats}
+
+
+def init_reality_tables():
+    """初始化现实连接相关的表"""
+    with get_db() as conn:
+        conn.executescript("""
+            CREATE TABLE IF NOT EXISTS reality_rewards (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                character_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                description TEXT,
+                category TEXT DEFAULT 'entertainment',
+                cost INTEGER NOT NULL,
+                icon TEXT DEFAULT ' ',
+                is_custom BOOLEAN DEFAULT 0,
+                times_redeemed INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (character_id) REFERENCES characters(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS habit_challenges (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                character_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                description TEXT,
+                duration_days INTEGER DEFAULT 21,
+                cost INTEGER NOT NULL,
+                reward_exp INTEGER DEFAULT 100,
+                reward_gold INTEGER DEFAULT 50,
+                status TEXT DEFAULT 'active',
+                start_date DATE,
+                end_date DATE,
+                check_in_days INTEGER DEFAULT 0,
+                last_check_in DATE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (character_id) REFERENCES characters(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS immunity_cards (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                character_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                description TEXT,
+                cost INTEGER NOT NULL,
+                uses_remaining INTEGER DEFAULT 1,
+                card_type TEXT DEFAULT 'skip_task',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (character_id) REFERENCES characters(id)
+            );
+
+            CREATE TABLE IF NOT EXISTS penalty_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                character_id INTEGER NOT NULL,
+                penalty_type TEXT NOT NULL,
+                description TEXT,
+                gold_lost INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (character_id) REFERENCES characters(id)
+            );
+        """)
+        
+        # 插入默认奖励模板
+        default_rewards = [
+            ("看一集电视剧", "放松一下，追剧时间到！", "entertainment", 30, " "),
+            ("玩30分钟游戏", "适度游戏益脑，沉迷游戏伤身", "entertainment", 50, " ️",
+            ("吃一顿好的", "美食是最好的奖励", "food", 80, " "),
+            ("睡个懒觉", "明天多睡30分钟", "rest", 40, " ️"),
+            ("买一本想看的书", "知识就是力量", "education", 100, " "),
+            ("看一部电影", "光影世界，放松心情", "entertainment", 60, " "),
+            ("喝一杯奶茶", "甜蜜的小确幸", "food", 20, " "),
+            ("逛街购物", "买买买！", "shopping", 150, " ️"),
+        ]
+        
+        # 检查是否已有默认奖励
+        count = conn.execute("SELECT COUNT(*) FROM reality_rewards WHERE is_custom = 0").fetchone()[0]
+        if count == 0:
+            for name, desc, cat, cost, icon in default_rewards:
+                conn.execute(
+                    "INSERT INTO reality_rewards (character_id, name, description, category, cost, icon, is_custom) VALUES (0, ?, ?, ?, ?, ?, 0)",
+                    (name, desc, cat, cost, icon)
+                )
+
+
+def get_reality_rewards(character_id: int) -> list:
+    """获取可用的现实奖励"""
+    with get_db() as conn:
+        # 获取默认奖励和用户自定义奖励
+        rewards = conn.execute(
+            """SELECT * FROM reality_rewards 
+               WHERE character_id = 0 OR character_id = ?
+               ORDER BY cost ASC""",
+            (character_id,)
+        ).fetchall()
+        return [dict(r) for r in rewards]
+
+
+def add_custom_reward(character_id: int, name: str, description: str, cost: int, category: str = "custom") -> dict:
+    """添加自定义奖励"""
+    with get_db() as conn:
+        cursor = conn.execute(
+            "INSERT INTO reality_rewards (character_id, name, description, category, cost, icon, is_custom) VALUES (?, ?, ?, ?, ?, ' ', 1)",
+            (character_id, name, description, category, cost)
+        )
+        return {"id": cursor.lastrowid, "name": name, "cost": cost}
+
+
+def redeem_reward(character_id: int, reward_id: int) -> dict:
+    """兑换奖励"""
+    with get_db() as conn:
+        # 获取奖励信息
+        reward = conn.execute("SELECT * FROM reality_rewards WHERE id = ?", (reward_id,)).fetchone()
+        if not reward:
+            return {"success": False, "error": "奖励不存在"}
+        
+        # 获取角色金币
+        character = conn.execute("SELECT gold FROM characters WHERE id = ?", (character_id,)).fetchone()
+        if not character:
+            return {"success": False, "error": "角色不存在"}
+        
+        if character["gold"] < reward["cost"]:
+            return {"success": False, "error": f"金币不足！需要{reward['cost']}金币，当前只有{character['gold']}金币"}
+        
+        # 扣除金币
+        conn.execute(
+            "UPDATE characters SET gold = gold - ? WHERE id = ?",
+            (reward["cost"], character_id)
+        )
+        
+        # 记录兑换次数
+        conn.execute(
+            "UPDATE reality_rewards SET times_redeemed = times_redeemed + 1 WHERE id = ?",
+            (reward_id,)
+        )
+        
+        return {
+            "success": True,
+            "reward_name": reward["name"],
+            "cost": reward["cost"],
+            "remaining_gold": character["gold"] - reward["cost"]
+        }
+
+
+def get_habit_challenges(character_id: int) -> list:
+    """获取习惯挑战"""
+    with get_db() as conn:
+        challenges = conn.execute(
+            "SELECT * FROM habit_challenges WHERE character_id = ? ORDER BY created_at DESC",
+            (character_id,)
+        ).fetchall()
+        return [dict(c) for c in challenges]
+
+
+def create_habit_challenge(character_id: int, name: str, description: str, duration_days: int, cost: int) -> dict:
+    """创建习惯挑战"""
+    with get_db() as conn:
+        # 检查金币
+        character = conn.execute("SELECT gold FROM characters WHERE id = ?", (character_id,)).fetchone()
+        if not character or character["gold"] < cost:
+            return {"success": False, "error": "金币不足"}
+        
+        # 扣除金币
+        conn.execute("UPDATE characters SET gold = gold - ? WHERE id = ?", (cost, character_id))
+        
+        # 创建挑战
+        start_date = datetime.now().date()
+        end_date = start_date + timedelta(days=duration_days)
+        cursor = conn.execute(
+            """INSERT INTO habit_challenges 
+               (character_id, name, description, duration_days, cost, start_date, end_date) 
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (character_id, name, description, duration_days, cost, start_date, end_date)
+        )
+        
+        return {"success": True, "challenge_id": cursor.lastrowid}
+
+
+def check_in_challenge(character_id: int, challenge_id: int) -> dict:
+    """习惯挑战打卡"""
+    with get_db() as conn:
+        challenge = conn.execute(
+            "SELECT * FROM habit_challenges WHERE id = ? AND character_id = ?",
+            (challenge_id, character_id)
+        ).fetchone()
+        
+        if not challenge:
+            return {"success": False, "error": "挑战不存在"}
+        
+        if challenge["status"] != "active":
+            return {"success": False, "error": "挑战已结束"}
+        
+        today = datetime.now().date()
+        if challenge["last_check_in"] == str(today):
+            return {"success": False, "error": "今天已经打卡过了"}
+        
+        # 更新打卡
+        new_check_in_days = challenge["check_in_days"] + 1
+        conn.execute(
+            "UPDATE habit_challenges SET check_in_days = ?, last_check_in = ? WHERE id = ?",
+            (new_check_in_days, today, challenge_id)
+        )
+        
+        # 检查是否完成
+        if new_check_in_days >= challenge["duration_days"]:
+            conn.execute(
+                "UPDATE habit_challenges SET status = 'completed' WHERE id = ?",
+                (challenge_id,)
+            )
+            # 给予奖励
+            conn.execute(
+                "UPDATE characters SET exp = exp + ?, gold = gold + ? WHERE id = ?",
+                (challenge["reward_exp"], challenge["reward_gold"], character_id)
+            )
+            return {
+                "success": True,
+                "completed": True,
+                "reward_exp": challenge["reward_exp"],
+                "reward_gold": challenge["reward_gold"]
+            }
+        
+        return {"success": True, "completed": False, "days_remaining": challenge["duration_days"] - new_check_in_days}
+
+
+def get_immunity_cards(character_id: int) -> list:
+    """获取免罪金牌"""
+    with get_db() as conn:
+        cards = conn.execute(
+            "SELECT * FROM immunity_cards WHERE character_id = ? AND uses_remaining > 0",
+            (character_id,)
+        ).fetchall()
+        return [dict(c) for c in cards]
+
+
+def buy_immunity_card(character_id: int, card_type: str) -> dict:
+    """购买免罪金牌"""
+    card_configs = {
+        "skip_task": {"name": "任务跳过卡", "desc": "跳过一个不想做的任务", "cost": 50, "icon": "⏭️"},
+        "rest_day": {"name": "休息日卡", "desc": "允许一天不打卡不扣金币", "cost": 80, "icon": " ️"},
+        "double_reward": {"name": "双倍奖励卡", "desc": "下次任务获得双倍奖励", "cost": 100, "icon": "✨"},
+        "penalty_shield": {"name": "惩罚护盾", "desc": "抵挡一次金币惩罚", "cost": 60, "icon": " ️"},
+    }
+    
+    config = card_configs.get(card_type)
+    if not config:
+        return {"success": False, "error": "未知的卡牌类型"}
+    
+    with get_db() as conn:
+        character = conn.execute("SELECT gold FROM characters WHERE id = ?", (character_id,)).fetchone()
+        if not character or character["gold"] < config["cost"]:
+            return {"success": False, "error": "金币不足"}
+        
+        conn.execute("UPDATE characters SET gold = gold - ? WHERE id = ?", (config["cost"], character_id))
+        conn.execute(
+            "INSERT INTO immunity_cards (character_id, name, description, cost, card_type) VALUES (?, ?, ?, ?, ?)",
+            (character_id, config["name"], config["desc"], config["cost"], card_type)
+        )
+        
+        return {"success": True, "card_name": config["name"]}
+
+
+def check_penalty(character_id: int) -> dict:
+    """检查并执行惩罚机制"""
+    with get_db() as conn:
+        # 获取最近7天的活动记录
+        seven_days_ago = (datetime.now() - timedelta(days=7)).date()
+        activity_count = conn.execute(
+            "SELECT COUNT(*) FROM activity_logs WHERE character_id = ? AND DATE(created_at) >= ?",
+            (character_id, seven_days_ago)
+        ).fetchone()[0]
+        
+        # 获取角色信息
+        character = conn.execute("SELECT * FROM characters WHERE id = ?", (character_id,)).fetchone()
+        if not character:
+            return {"penalty": False}
+        
+        # 检查是否有惩罚护盾
+        shield = conn.execute(
+            "SELECT id FROM immunity_cards WHERE character_id = ? AND card_type = 'penalty_shield' AND uses_remaining > 0",
+            (character_id,)
+        ).fetchone()
+        
+        # 如果7天内活动少于3次，触发惩罚
+        if activity_count < 3:
+            if shield:
+                # 使用护盾
+                conn.execute("UPDATE immunity_cards SET uses_remaining = uses_remaining - 1 WHERE id = ?", (shield["id"],))
+                return {"penalty": False, "shield_used": True}
+            
+            # 扣除金币惩罚
+            penalty_gold = min(50, character["gold"])
+            if penalty_gold > 0:
+                conn.execute("UPDATE characters SET gold = gold - ? WHERE id = ?", (penalty_gold, character_id))
+                conn.execute(
+                    "INSERT INTO penalty_log (character_id, penalty_type, description, gold_lost) VALUES (?, 'inactive', ?, ?)",
+                    (character_id, f"连续7天活动不足3次，扣除{penalty_gold}金币", penalty_gold)
+                )
+                return {"penalty": True, "gold_lost": penalty_gold, "reason": "连续7天活动不足3次"}
+        
+        return {"penalty": False}
+
+
+def get_penalty_history(character_id: int) -> list:
+    """获取惩罚历史"""
+    with get_db() as conn:
+        history = conn.execute(
+            "SELECT * FROM penalty_log WHERE character_id = ? ORDER BY created_at DESC LIMIT 20",
+            (character_id,)
+        ).fetchall()
+        return [dict(h) for h in history]

@@ -14,7 +14,10 @@ from database import (
     add_title, get_titles, add_quest, get_quests, complete_quest, get_db,
     get_all_characters, get_character_count, delete_character,
     get_activity_stats, get_activity_history, get_attribute_history,
-    get_weekly_activity_type_stats
+    get_weekly_activity_type_stats,
+    init_reality_tables, get_reality_rewards, add_custom_reward, redeem_reward,
+    get_habit_challenges, create_habit_challenge, check_in_challenge,
+    get_immunity_cards, buy_immunity_card, check_penalty, get_penalty_history
 )
 from game_engine import (
     classify_activity, calculate_exp_gain, calculate_gold_gain,
@@ -36,6 +39,7 @@ from models import (
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    init_reality_tables()
     print("数据库初始化完成")
     yield
 
@@ -723,6 +727,115 @@ async def serve_frontend():
     if os.path.exists(index_path):
         return FileResponse(index_path)
     return {"message": "LifeRPG API 运行中！请构建前端或访问 /docs 查看API文档"}
+
+
+# ==================== 现实连接 API ====================
+
+@app.get("/api/reality/rewards/{character_id}")
+async def api_get_reality_rewards(character_id: int):
+    """获取现实奖励列表"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    rewards = get_reality_rewards(character_id)
+    return {"rewards": rewards, "gold": character["gold"]}
+
+
+@app.post("/api/reality/rewards/{character_id}/add")
+async def api_add_custom_reward(character_id: int, data: dict):
+    """添加自定义奖励"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    name = data.get("name")
+    description = data.get("description", "")
+    cost = data.get("cost", 50)
+    if not name:
+        raise HTTPException(status_code=400, detail="奖励名称不能为空")
+    result = add_custom_reward(character_id, name, description, cost)
+    return result
+
+
+@app.post("/api/reality/rewards/{character_id}/redeem/{reward_id}")
+async def api_redeem_reward(character_id: int, reward_id: int):
+    """兑换奖励"""
+    result = redeem_reward(character_id, reward_id)
+    if not result.get("success"):
+        raise HTTPException(status_code=400, detail=result.get("error", "兑换失败"))
+    return result
+
+
+@app.get("/api/reality/challenges/{character_id}")
+async def api_get_habit_challenges(character_id: int):
+    """获取习惯挑战"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    challenges = get_habit_challenges(character_id)
+    return {"challenges": challenges, "gold": character["gold"]}
+
+
+@app.post("/api/reality/challenges/{character_id}/create")
+async def api_create_habit_challenge(character_id: int, data: dict):
+    """创建习惯挑战"""
+    name = data.get("name")
+    description = data.get("description", "")
+    duration_days = data.get("duration_days", 21)
+    cost = data.get("cost", 50)
+    if not name:
+        raise HTTPException(status_code=400, detail="挑战名称不能为空")
+    result = create_habit_challenge(character_id, name, description, duration_days, cost)
+    if not result.get("success"):
+        raise HTTPException(status_code=400, detail=result.get("error", "创建失败"))
+    return result
+
+
+@app.post("/api/reality/challenges/{challenge_id}/checkin/{character_id}")
+async def api_check_in_challenge(character_id: int, challenge_id: int):
+    """习惯挑战打卡"""
+    result = check_in_challenge(character_id, challenge_id)
+    if not result.get("success"):
+        raise HTTPException(status_code=400, detail=result.get("error", "打卡失败"))
+    return result
+
+
+@app.get("/api/reality/cards/{character_id}")
+async def api_get_immunity_cards(character_id: int):
+    """获取免罪金牌"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    cards = get_immunity_cards(character_id)
+    return {"cards": cards, "gold": character["gold"]}
+
+
+@app.post("/api/reality/cards/{character_id}/buy")
+async def api_buy_immunity_card(character_id: int, data: dict):
+    """购买免罪金牌"""
+    card_type = data.get("card_type")
+    if not card_type:
+        raise HTTPException(status_code=400, detail="卡牌类型不能为空")
+    result = buy_immunity_card(character_id, card_type)
+    if not result.get("success"):
+        raise HTTPException(status_code=400, detail=result.get("error", "购买失败"))
+    return result
+
+
+@app.get("/api/reality/penalty/{character_id}")
+async def api_check_penalty(character_id: int):
+    """检查惩罚"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    result = check_penalty(character_id)
+    return result
+
+
+@app.get("/api/reality/penalty/{character_id}/history")
+async def api_get_penalty_history(character_id: int):
+    """获取惩罚历史"""
+    history = get_penalty_history(character_id)
+    return {"history": history}
 
 
 if __name__ == "__main__":
