@@ -35,3 +35,6 @@ Thumbs.db
 # Environment
 .env
 .env.local
+
+# Config (contains API keys)
+backend/config.json
