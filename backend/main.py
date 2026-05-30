@@ -766,6 +766,13 @@ async def api_redeem_reward(character_id: int, reward_id: int):
     return result
 
 
+@app.get("/api/reality/challenges/templates")
+async def api_get_challenge_templates():
+    """获取挑战模板"""
+    templates = get_challenge_templates()
+    return {"templates": templates}
+
+
 @app.get("/api/reality/challenges/{character_id}")
 async def api_get_habit_challenges(character_id: int):
     """获取习惯挑战"""
@@ -798,13 +805,6 @@ async def api_check_in_challenge(character_id: int, challenge_id: int):
     if not result.get("success"):
         raise HTTPException(status_code=400, detail=result.get("error", "打卡失败"))
     return result
-
-
-@app.get("/api/reality/challenges/templates")
-async def api_get_challenge_templates():
-    """获取挑战模板"""
-    templates = get_challenge_templates()
-    return {"templates": templates}
 
 
 @app.get("/api/reality/cards/{character_id}")
