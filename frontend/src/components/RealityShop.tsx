@@ -47,6 +47,8 @@ export default function RealityShop({ characterId, onRefresh }: RealityShopProps
         getPenaltyHistory(characterId),
         getChallengeTemplates()
       ]);
+      console.log('Rewards:', rewardsData);
+      console.log('Templates:', templatesData);
       setRewards(rewardsData.rewards);
       setGold(rewardsData.gold);
       setChallenges(challengesData.challenges);
@@ -56,6 +58,7 @@ export default function RealityShop({ characterId, onRefresh }: RealityShopProps
       setChallengeTemplates(templatesData.templates);
     } catch (e) {
       console.error('加载数据失败:', e);
+      showMessage('error', '加载数据失败，请检查后端是否运行');
     } finally {
       setLoading(false);
     }
