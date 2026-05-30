@@ -343,6 +343,11 @@ export const getHabitChallenges = async (characterId: number): Promise<{challeng
   return res.data;
 };
 
+export const getChallengeTemplates = async (): Promise<{templates: any[]}> => {
+  const res = await api.get('/reality/challenges/templates');
+  return res.data;
+};
+
 export const createHabitChallenge = async (characterId: number, data: {name: string, description?: string, duration_days?: number, cost?: number}): Promise<any> => {
   const res = await api.post(`/reality/challenges/${characterId}/create`, data);
   return res.data;

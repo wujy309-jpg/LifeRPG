@@ -648,3 +648,100 @@
 .confirm-btn:hover {
   transform: translateY(-2px);
 }
+
+/* 模板选择 */
+.modal-large {
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.templates-section {
+  margin-bottom: 20px;
+}
+
+.templates-section h4 {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.template-card {
+  background: var(--bg-dark);
+  border: 2px solid var(--border-dark);
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.template-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.template-card.selected {
+  border-color: var(--gold);
+  background: rgba(245, 197, 24, 0.1);
+}
+
+.template-icon {
+  font-size: 24px;
+}
+
+.template-name {
+  font-size: 12px;
+  color: var(--text-primary);
+  text-align: center;
+  font-weight: 500;
+}
+
+.template-cost {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--gold);
+}
+
+.divider {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin: 16px 0;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: var(--border-dark);
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}

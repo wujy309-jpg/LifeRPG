@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { 
   getRealityRewards, addCustomReward, redeemReward,
   getHabitChallenges, createHabitChallenge, checkInChallenge,
-  getImmunityCards, buyImmunityCard, checkPenalty, getPenaltyHistory
+  getImmunityCards, buyImmunityCard, checkPenalty, getPenaltyHistory,
+  getChallengeTemplates
 } from '../services/api';
 import type { RealityReward, HabitChallenge, ImmunityCard } from '../services/api';
 import './RealityShop.css';
@@ -24,6 +25,7 @@ export default function RealityShop({ characterId, onRefresh }: RealityShopProps
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
   const [penaltyInfo, setPenaltyInfo] = useState<any>(null);
   const [penaltyHistory, setPenaltyHistory] = useState<any[]>([]);
+  const [challengeTemplates, setChallengeTemplates] = useState<any[]>([]);
 
   // 新奖励表单
   const [newReward, setNewReward] = useState({name: '', description: '', cost: 50});
@@ -37,12 +39,13 @@ export default function RealityShop({ characterId, onRefresh }: RealityShopProps
   const loadData = async () => {
     setLoading(true);
     try {
-      const [rewardsData, challengesData, cardsData, penaltyData, historyData] = await Promise.all([
+      const [rewardsData, challengesData, cardsData, penaltyData, historyData, templatesData] = await Promise.all([
         getRealityRewards(characterId),
         getHabitChallenges(characterId),
         getImmunityCards(characterId),
         checkPenalty(characterId),
-        getPenaltyHistory(characterId)
+        getPenaltyHistory(characterId),
+        getChallengeTemplates()
       ]);
       setRewards(rewardsData.rewards);
       setGold(rewardsData.gold);
@@ -50,6 +53,7 @@ export default function RealityShop({ characterId, onRefresh }: RealityShopProps
       setCards(cardsData.cards);
       setPenaltyInfo(penaltyData);
       setPenaltyHistory(historyData.history);
+      setChallengeTemplates(templatesData.templates);
     } catch (e) {
       console.error('加载数据失败:', e);
     } finally {
@@ -329,8 +333,36 @@ export default function RealityShop({ characterId, onRefresh }: RealityShopProps
 
           {showCreateChallenge && (
             <div className="modal-overlay" onClick={() => setShowCreateChallenge(false)}>
-              <div className="modal" onClick={e => e.stopPropagation()}>
+              <div className="modal modal-large" onClick={e => e.stopPropagation()}>
                 <h3>创建习惯挑战</h3>
+                
+                <div className="templates-section">
+                  <h4>选择挑战模板</h4>
+                  <div className="templates-grid">
+                    {challengeTemplates.map(template => (
+                      <div 
+                        key={template.id} 
+                        className={`template-card ${newChallenge.name === template.name ? 'selected' : ''}`}
+                        onClick={() => setNewChallenge({
+                          name: template.name,
+                          description: template.description,
+                          duration_days: template.duration_days,
+                          cost: template.cost
+                        })}
+                      >
+                        <span className="template-icon">{template.icon}</span>
+                        <span className="template-name">{template.name}</span>
+                        <span className="template-cost">
+                          <span className="cost-icon"> </span>
+                          {template.cost}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="divider">或自定义</div>
+
                 <div className="form-group">
                   <label>挑战名称</label>
                   <input 
@@ -349,24 +381,26 @@ export default function RealityShop({ characterId, onRefresh }: RealityShopProps
                     placeholder="挑战描述"
                   />
                 </div>
-                <div className="form-group">
-                  <label>持续天数</label>
-                  <input 
-                    type="number" 
-                    value={newChallenge.duration_days}
-                    onChange={e => setNewChallenge({...newChallenge, duration_days: parseInt(e.target.value) || 21})}
-                    min="7"
-                    max="100"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>投入金币</label>
-                  <input 
-                    type="number" 
-                    value={newChallenge.cost}
-                    onChange={e => setNewChallenge({...newChallenge, cost: parseInt(e.target.value) || 50})}
-                    min="10"
-                  />
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>持续天数</label>
+                    <input 
+                      type="number" 
+                      value={newChallenge.duration_days}
+                      onChange={e => setNewChallenge({...newChallenge, duration_days: parseInt(e.target.value) || 21})}
+                      min="7"
+                      max="100"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>投入金币</label>
+                    <input 
+                      type="number" 
+                      value={newChallenge.cost}
+                      onChange={e => setNewChallenge({...newChallenge, cost: parseInt(e.target.value) || 50})}
+                      min="10"
+                    />
+                  </div>
                 </div>
                 <p className="form-hint">投入的金币越多，完成时获得的奖励越丰厚！</p>
                 <div className="modal-actions">

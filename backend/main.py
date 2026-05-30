@@ -17,7 +17,8 @@ from database import (
     get_weekly_activity_type_stats,
     init_reality_tables, get_reality_rewards, add_custom_reward, redeem_reward,
     get_habit_challenges, create_habit_challenge, check_in_challenge,
-    get_immunity_cards, buy_immunity_card, check_penalty, get_penalty_history
+    get_immunity_cards, buy_immunity_card, check_penalty, get_penalty_history,
+    get_challenge_templates
 )
 from game_engine import (
     classify_activity, calculate_exp_gain, calculate_gold_gain,
@@ -797,6 +798,13 @@ async def api_check_in_challenge(character_id: int, challenge_id: int):
     if not result.get("success"):
         raise HTTPException(status_code=400, detail=result.get("error", "打卡失败"))
     return result
+
+
+@app.get("/api/reality/challenges/templates")
+async def api_get_challenge_templates():
+    """获取挑战模板"""
+    templates = get_challenge_templates()
+    return {"templates": templates}
 
 
 @app.get("/api/reality/cards/{character_id}")

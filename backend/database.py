@@ -753,14 +753,49 @@ def init_reality_tables():
         
         # 插入默认奖励模板
         default_rewards = [
+            # 娱乐类
             ("看一集电视剧", "放松一下，追剧时间到！", "entertainment", 30, " "),
-            ("玩30分钟游戏", "适度游戏益脑，沉迷游戏伤身", "entertainment", 50, " ️",
-            ("吃一顿好的", "美食是最好的奖励", "food", 80, " "),
-            ("睡个懒觉", "明天多睡30分钟", "rest", 40, " ️"),
-            ("买一本想看的书", "知识就是力量", "education", 100, " "),
+            ("玩30分钟游戏", "适度游戏益脑，沉迷游戏伤身", "entertainment", 50, " ️"),
             ("看一部电影", "光影世界，放松心情", "entertainment", 60, " "),
+            ("刷30分钟短视频", "适当放松，别沉迷哦", "entertainment", 20, " "),
+            ("唱KTV一小时", "释放压力，放声歌唱", "entertainment", 80, " "),
+            ("打一局桌游", "动动脑子，享受乐趣", "entertainment", 40, " "),
+            
+            # 美食类
+            ("吃一顿好的", "美食是最好的奖励", "food", 80, " "),
             ("喝一杯奶茶", "甜蜜的小确幸", "food", 20, " "),
+            ("点一份外卖大餐", "今天不想做饭，犒劳自己", "food", 60, " "),
+            ("去网红店打卡", "探索美食，记录生活", "food", 100, " ️"),
+            ("买一份甜品", "生活需要一点甜", "food", 30, " "),
+            
+            # 休息类
+            ("睡个懒觉", "明天多睡30分钟", "rest", 40, " ️"),
+            ("泡个热水澡", "放松身心，洗去疲惫", "rest", 35, " "),
+            ("做个面膜", "护肤时间，宠爱自己", "rest", 25, " "),
+            ("冥想15分钟", "放空大脑，回归平静", "rest", 15, " "),
+            ("早睡一小时", "今天提前休息，明天更有精神", "rest", 30, " ️"),
+            
+            # 学习类
+            ("买一本想看的书", "知识就是力量", "education", 100, " "),
+            ("看一个TED演讲", "开拓视野，获取灵感", "education", 30, " "),
+            ("学习新技能30分钟", "投资自己，提升能力", "education", 50, " "),
+            ("听一期播客", "碎片时间，充实大脑", "education", 20, " "),
+            
+            # 购物类
             ("逛街购物", "买买买！", "shopping", 150, " ️"),
+            ("买一件新衣服", "换个风格，换个心情", "shopping", 200, " "),
+            ("买一件小饰品", "点缀生活的小物件", "shopping", 80, " "),
+            ("买一束花", "生活需要仪式感", "shopping", 50, " "),
+            
+            # 社交类
+            ("请朋友喝咖啡", "社交也是一种充电", "social", 60, " ☕"),
+            ("给家人打电话", "关心家人，传递温暖", "social", 15, " "),
+            ("约朋友聚餐", "美食与友情不可辜负", "social", 120, " "),
+            
+            # 运动类
+            ("买运动饮料", "补充能量，继续加油", "health", 15, " "),
+            ("按摩30分钟", "放松肌肉，缓解疲劳", "health", 80, " "),
+            ("买一双新运动鞋", "工欲善其事，必先利其器", "health", 250, " "),
         ]
         
         # 检查是否已有默认奖励
@@ -770,6 +805,44 @@ def init_reality_tables():
                 conn.execute(
                     "INSERT INTO reality_rewards (character_id, name, description, category, cost, icon, is_custom) VALUES (0, ?, ?, ?, ?, ?, 0)",
                     (name, desc, cat, cost, icon)
+                )
+        
+        # 插入默认习惯挑战模板（character_id=0 表示模板）
+        default_challenges = [
+            ("21天早起挑战", "每天7点前起床，养成早起习惯", 21, 50, 100, 50, " "),
+            ("21天运动挑战", "每天运动30分钟，塑造健康体魄", 21, 60, 120, 60, " ️"),
+            ("21天阅读挑战", "每天阅读30分钟，开拓视野", 21, 40, 80, 40, " "),
+            ("21天冥想挑战", "每天冥想10分钟，平静内心", 21, 30, 60, 30, " "),
+            ("21天喝水挑战", "每天喝8杯水，保持健康", 21, 20, 40, 20, " "),
+            ("21天不熬夜挑战", "每天11点前睡觉，规律作息", 21, 45, 90, 45, " ️"),
+            ("21天学习挑战", "每天学习1小时，提升自我", 21, 70, 140, 70, " "),
+            ("21天写日记挑战", "每天记录生活，反思成长", 21, 25, 50, 25, " "),
+            ("7天断舍离挑战", "每天扔掉一件不需要的东西", 7, 30, 60, 30, " "),
+            ("14天健康饮食挑战", "拒绝垃圾食品，健康饮食", 14, 80, 160, 80, " "),
+            ("30天存钱挑战", "每天存10元，养成储蓄习惯", 30, 100, 300, 100, " "),
+            ("7天不玩手机挑战", "每天手机使用不超过2小时", 7, 60, 120, 60, " "),
+        ]
+        
+        # 创建挑战模板表（如果不存在）
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS challenge_templates (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                description TEXT,
+                duration_days INTEGER,
+                cost INTEGER,
+                reward_exp INTEGER,
+                reward_gold INTEGER,
+                icon TEXT
+            )
+        """)
+        
+        template_count = conn.execute("SELECT COUNT(*) FROM challenge_templates").fetchone()[0]
+        if template_count == 0:
+            for name, desc, days, cost, exp, gold, icon in default_challenges:
+                conn.execute(
+                    "INSERT INTO challenge_templates (name, description, duration_days, cost, reward_exp, reward_gold, icon) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (name, desc, days, cost, exp, gold, icon)
                 )
 
 
@@ -842,7 +915,14 @@ def get_habit_challenges(character_id: int) -> list:
         return [dict(c) for c in challenges]
 
 
-def create_habit_challenge(character_id: int, name: str, description: str, duration_days: int, cost: int) -> dict:
+def get_challenge_templates() -> list:
+    """获取挑战模板"""
+    with get_db() as conn:
+        templates = conn.execute("SELECT * FROM challenge_templates ORDER BY cost ASC").fetchall()
+        return [dict(t) for t in templates]
+
+
+def create_habit_challenge(character_id: int, name: str, description: str, duration_days: int, cost: int, reward_exp: int = None, reward_gold: int = None) -> dict:
     """创建习惯挑战"""
     with get_db() as conn:
         # 检查金币
@@ -853,14 +933,20 @@ def create_habit_challenge(character_id: int, name: str, description: str, durat
         # 扣除金币
         conn.execute("UPDATE characters SET gold = gold - ? WHERE id = ?", (cost, character_id))
         
+        # 计算奖励（如果没有指定，则根据成本计算）
+        if reward_exp is None:
+            reward_exp = cost * 2
+        if reward_gold is None:
+            reward_gold = cost
+        
         # 创建挑战
         start_date = datetime.now().date()
         end_date = start_date + timedelta(days=duration_days)
         cursor = conn.execute(
             """INSERT INTO habit_challenges 
-               (character_id, name, description, duration_days, cost, start_date, end_date) 
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (character_id, name, description, duration_days, cost, start_date, end_date)
+               (character_id, name, description, duration_days, cost, reward_exp, reward_gold, start_date, end_date) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (character_id, name, description, duration_days, cost, reward_exp, reward_gold, start_date, end_date)
         )
         
         return {"success": True, "challenge_id": cursor.lastrowid}
