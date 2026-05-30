@@ -269,7 +269,7 @@ function Dashboard({ data, onRefresh }: DashboardProps) {
 
             {feedback.ai_comment && (
               <div className="ai-comment">
-                <p className="comment-label">AI 评价</p>
+                <p className="comment-label">  AI 锐评</p>
                 <p className="comment-text">{feedback.ai_comment}</p>
               </div>
             )}

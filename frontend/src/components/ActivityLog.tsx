@@ -149,7 +149,7 @@ function ActivityLog({ characterId, onActivityLogged }: ActivityLogProps) {
 
             {feedback.ai_comment && (
               <div className="ai-comment-box">
-                <p className="comment-label">  AI 评价</p>
+                <p className="comment-label">  AI 锐评</p>
                 <p className="comment-content">{feedback.ai_comment}</p>
               </div>
             )}
