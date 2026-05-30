@@ -259,14 +259,15 @@ def create_character(name: str, gender: str = "", age: int = 0, height: float = 
     stats = calculate_initial_stats(gender, age, height, weight, education, occupation)
     
     with get_db() as conn:
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cursor = conn.execute(
             """INSERT INTO characters 
                (name, gender, age, height, weight, education, occupation,
-                strength, intelligence, agility, charisma, willpower)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                strength, intelligence, agility, charisma, willpower, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (name, gender, age, height, weight, education, occupation,
              stats["strength"], stats["intelligence"], stats["agility"], 
-             stats["charisma"], stats["willpower"])
+             stats["charisma"], stats["willpower"], now)
         )
         conn.commit()
         character_id = cursor.lastrowid
@@ -331,13 +332,14 @@ def add_activity_log(character_id: int, activity_type: str, description: str,
                     exp_gained: int, gold_gained: int,
                     attribute_changes: dict, ai_feedback: str = None) -> dict:
     with get_db() as conn:
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cursor = conn.execute(
             """INSERT INTO activity_logs 
                (character_id, activity_type, description, exp_gained, 
-                gold_gained, attribute_changes, ai_feedback)
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                gold_gained, attribute_changes, ai_feedback, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
             (character_id, activity_type, description, exp_gained,
-             gold_gained, json.dumps(attribute_changes), ai_feedback)
+             gold_gained, json.dumps(attribute_changes), ai_feedback, now)
         )
         row = conn.execute(
             "SELECT * FROM activity_logs WHERE id = ?",
@@ -364,14 +366,15 @@ def add_equipment(character_id: int, name: str, description: str,
     if use_bonus is None:
         use_bonus = {}
     with get_db() as conn:
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cursor = conn.execute(
             """INSERT INTO equipment 
                (character_id, name, description, rarity, stat_bonuses, special_effect,
-                use_desc, use_effect, use_bonus)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                use_desc, use_effect, use_bonus, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (character_id, name, description, rarity,
              json.dumps(stat_bonuses), special_effect,
-             use_desc, use_effect, json.dumps(use_bonus))
+             use_desc, use_effect, json.dumps(use_bonus), now)
         )
         row = conn.execute(
             "SELECT * FROM equipment WHERE id = ?",
@@ -392,10 +395,11 @@ def get_equipment(character_id: int) -> list:
 def add_title(character_id: int, name: str, description: str,
               unlock_condition: str = None) -> dict:
     with get_db() as conn:
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cursor = conn.execute(
-            """INSERT INTO titles (character_id, name, description, unlock_condition)
-               VALUES (?, ?, ?, ?)""",
-            (character_id, name, description, unlock_condition)
+            """INSERT INTO titles (character_id, name, description, unlock_condition, created_at)
+               VALUES (?, ?, ?, ?, ?)""",
+            (character_id, name, description, unlock_condition, now)
         )
         row = conn.execute(
             "SELECT * FROM titles WHERE id = ?",
@@ -417,11 +421,12 @@ def add_quest(character_id: int, title: str, description: str,
               quest_type: str, exp_reward: int, gold_reward: int,
               due_date: str = None) -> dict:
     with get_db() as conn:
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cursor = conn.execute(
             """INSERT INTO quests 
-               (character_id, title, description, quest_type, exp_reward, gold_reward, due_date)
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (character_id, title, description, quest_type, exp_reward, gold_reward, due_date)
+               (character_id, title, description, quest_type, exp_reward, gold_reward, due_date, created_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            (character_id, title, description, quest_type, exp_reward, gold_reward, due_date, now)
         )
         row = conn.execute(
             "SELECT * FROM quests WHERE id = ?",
