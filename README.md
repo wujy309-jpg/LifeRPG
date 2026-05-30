@@ -75,8 +75,21 @@
 
 ### 启动系统
 
+**方式一：一键启动（推荐）**
 ```bash
 start.bat
+```
+会同时启动后端和前端服务。
+
+**方式二：分别启动**
+```bash
+# 终端1：启动后端
+cd backend
+python main.py
+
+# 终端2：启动前端
+cd frontend
+npm run dev
 ```
 
 访问 http://localhost:8000
