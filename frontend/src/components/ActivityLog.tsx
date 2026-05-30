@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { logActivity } from '../services/api';
 import type { GameFeedback } from '../services/api';
 import { GameIcon, ICONS } from './GameIcons';
@@ -14,6 +14,7 @@ function ActivityLog({ characterId, onActivityLogged }: ActivityLogProps) {
   const [feedback, setFeedback] = useState<GameFeedback | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   const handleSubmit = async () => {
     if (!description.trim()) return;
@@ -22,6 +23,7 @@ function ActivityLog({ characterId, onActivityLogged }: ActivityLogProps) {
     try {
       const result = await logActivity(characterId, description);
       setFeedback(result);
+      setShowModal(true);
       setDescription('');
       onActivityLogged();
     } catch (e: any) {
@@ -31,6 +33,10 @@ function ActivityLog({ characterId, onActivityLogged }: ActivityLogProps) {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   const getRarityColor = (rarity: string) => {
@@ -76,10 +82,82 @@ function ActivityLog({ characterId, onActivityLogged }: ActivityLogProps) {
         >
           {submitting ? '⏳ AI 分析中...' : '⚔️ 提交记录'}
         </button>
-        {error && (
-          <div className="error-message">
-            ❌ {error}
+      {error && (
+        <div className="error-message">
+          ❌ {error}
+        </div>
+      )}
+
+      {/* 反馈弹窗 */}
+      {showModal && feedback && (
+        <div className="feedback-modal-overlay" onClick={closeModal}>
+          <div className="feedback-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={closeModal}>✕</button>
+            <h3 className="modal-title">⚔️ 战斗报告</h3>
+            
+            <div className="gains-row">
+              <div className="gain-item exp">
+                <span className="gain-icon">⭐</span>
+                <span className="gain-label">经验值</span>
+                <span className="gain-value">+{feedback.activity_log.exp_gained}</span>
+              </div>
+              <div className="gain-item gold">
+                <span className="gain-icon"> </span>
+                <span className="gain-label">金币</span>
+                <span className="gain-value">+{feedback.activity_log.gold_gained}</span>
+              </div>
+            </div>
+
+            {feedback.level_up && (
+              <div className="level-up-alert">
+                <span> </span> 恭喜升级！达到 Lv.{feedback.new_level}
+              </div>
+            )}
+
+            {feedback.equipment_found && (
+              <div className="reward-card equipment" style={{ borderColor: getRarityColor(feedback.equipment_found.rarity) }}>
+                <h4>  获得装备</h4>
+                <p className="reward-name" style={{ color: getRarityColor(feedback.equipment_found.rarity) }}>
+                  [{feedback.equipment_found.rarity}] {feedback.equipment_found.name}
+                </p>
+                <p className="reward-desc">{feedback.equipment_found.description}</p>
+              </div>
+            )}
+
+            {feedback.title_earned && (
+              <div className="reward-card title">
+                <h4>  获得称号</h4>
+                <p className="reward-name">「{feedback.title_earned.name}」</p>
+                <p className="reward-desc">{feedback.title_earned.description}</p>
+              </div>
+            )}
+
+            {feedback.quest_generated && (
+              <div className="reward-card quest">
+                <h4>  新任务</h4>
+                <p className="reward-name">{feedback.quest_generated.title}</p>
+                <p className="reward-desc">{feedback.quest_generated.description}</p>
+                <div className="quest-rewards">
+                  <span>+{feedback.quest_generated.exp_reward} EXP</span>
+                  <span>+{feedback.quest_generated.gold_reward}G</span>
+                </div>
+              </div>
+            )}
+
+            {feedback.ai_comment && (
+              <div className="ai-comment-box">
+                <p className="comment-label">  AI 锐评</p>
+                <p className="comment-content">{feedback.ai_comment}</p>
+              </div>
+            )}
+
+            <button className="modal-confirm" onClick={closeModal}>
+              继续冒险
+            </button>
           </div>
+        </div>
+      )}
+    </div>
         )}
       </div>
 
