@@ -2,6 +2,8 @@
 
 把你的日常生活变成一场RPG冒险！记录活动获得经验值、金币、装备和称号。
 
+![image-20260530183710149](C:\Users\萨布拉\AppData\Roaming\Typora\typora-user-images\image-20260530183710149.png)
+
 ## 功能特色
 
 ### 核心系统
