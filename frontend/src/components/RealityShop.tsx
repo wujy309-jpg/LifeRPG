@@ -142,10 +142,12 @@ export default function RealityShop({ characterId, onRefresh }: RealityShopProps
   const getCategoryIcon = (category: string) => {
     const icons: Record<string, string> = {
       entertainment: ' ',
-      food: ' ',
-      rest: ' ️',
+      food: ' ️',
+      rest: ' ',
       education: ' ',
-      shopping: ' ️',
+      shopping: ' ',
+      social: ' ',
+      health: ' ❤️',
       custom: '✨'
     };
     return icons[category] || ' ';

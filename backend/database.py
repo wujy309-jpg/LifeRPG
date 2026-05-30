@@ -706,7 +706,8 @@ def init_reality_tables():
                 icon TEXT DEFAULT ' ',
                 is_custom BOOLEAN DEFAULT 0,
                 times_redeemed INTEGER DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(character_id, name)
             );
 
             CREATE TABLE IF NOT EXISTS habit_challenges (
@@ -795,36 +796,56 @@ def init_reality_tables():
             ("买一双新运动鞋", "工欲善其事，必先利其器", "health", 250, " "),
         ]
         
-        # 检查是否已有默认奖励
-        count = conn.execute("SELECT COUNT(*) FROM reality_rewards WHERE is_custom = 0").fetchone()[0]
-        if count == 0:
-            for name, desc, cat, cost, icon in default_rewards:
-                conn.execute(
-                    "INSERT INTO reality_rewards (character_id, name, description, category, cost, icon, is_custom) VALUES (0, ?, ?, ?, ?, ?, 0)",
-                    (name, desc, cat, cost, icon)
-                )
+        # 插入默认奖励（使用 INSERT OR IGNORE 避免重复）
+        for name, desc, cat, cost, icon in default_rewards:
+            conn.execute(
+                "INSERT OR IGNORE INTO reality_rewards (character_id, name, description, category, cost, icon, is_custom) VALUES (0, ?, ?, ?, ?, ?, 0)",
+                (name, desc, cat, cost, icon)
+            )
         
         # 插入默认习惯挑战模板（character_id=0 表示模板）
         default_challenges = [
+            # 健康类
             ("21天早起挑战", "每天7点前起床，养成早起习惯", 21, 50, 100, 50, " "),
             ("21天运动挑战", "每天运动30分钟，塑造健康体魄", 21, 60, 120, 60, " ️"),
-            ("21天阅读挑战", "每天阅读30分钟，开拓视野", 21, 40, 80, 40, " "),
-            ("21天冥想挑战", "每天冥想10分钟，平静内心", 21, 30, 60, 30, " "),
             ("21天喝水挑战", "每天喝8杯水，保持健康", 21, 20, 40, 20, " "),
-            ("21天不熬夜挑战", "每天11点前睡觉，规律作息", 21, 45, 90, 45, " ️"),
+            ("21天不熬夜挑战", "每天11点前睡觉，规律作息", 21, 45, 90, 45, " "),
+            ("14天健康饮食挑战", "拒绝垃圾食品，健康饮食", 14, 80, 160, 80, " "),
+            ("21天拉伸挑战", "每天拉伸10分钟，改善体态", 21, 30, 60, 30, " "),
+            ("7天不喝奶茶挑战", "戒掉奶茶，健康饮水", 7, 25, 50, 25, " "),
+            
+            # 学习类
+            ("21天阅读挑战", "每天阅读30分钟，开拓视野", 21, 40, 80, 40, " "),
             ("21天学习挑战", "每天学习1小时，提升自我", 21, 70, 140, 70, " "),
             ("21天写日记挑战", "每天记录生活，反思成长", 21, 25, 50, 25, " "),
+            ("21天背单词挑战", "每天背20个单词，扩充词汇", 21, 35, 70, 35, " "),
+            ("21天编程挑战", "每天写代码30分钟，精进技能", 21, 80, 160, 80, " "),
+            ("14天学一门新技能", "两周入门一项新技能", 14, 100, 200, 100, " "),
+            
+            # 心理类
+            ("21天冥想挑战", "每天冥想10分钟，平静内心", 21, 30, 60, 30, " "),
+            ("21天感恩挑战", "每天写下3件感恩的事", 21, 20, 40, 20, " "),
+            ("21天不抱怨挑战", "保持积极心态，不抱怨", 21, 50, 100, 50, " "),
+            ("7天数字断联", "每天手机使用不超过1小时", 7, 70, 140, 70, " "),
+            
+            # 生活类
             ("7天断舍离挑战", "每天扔掉一件不需要的东西", 7, 30, 60, 30, " "),
-            ("14天健康饮食挑战", "拒绝垃圾食品，健康饮食", 14, 80, 160, 80, " "),
             ("30天存钱挑战", "每天存10元，养成储蓄习惯", 30, 100, 300, 100, " "),
-            ("7天不玩手机挑战", "每天手机使用不超过2小时", 7, 60, 120, 60, " "),
+            ("21天做饭挑战", "每天自己做一顿饭", 21, 60, 120, 60, " "),
+            ("21天整理房间挑战", "每天整理一个角落", 21, 35, 70, 35, " "),
+            ("14天极简生活挑战", "减少不必要的消费", 14, 80, 160, 80, " "),
+            
+            # 社交类
+            ("21天社交挑战", "每天和一个朋友聊天", 21, 40, 80, 40, " "),
+            ("7天帮助他人挑战", "每天做一件帮助他人的事", 7, 50, 100, 50, " "),
+            ("21天赞美挑战", "每天真诚赞美一个人", 21, 25, 50, 25, " "),
         ]
         
         # 创建挑战模板表（如果不存在）
         conn.execute("""
             CREATE TABLE IF NOT EXISTS challenge_templates (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
+                name TEXT NOT NULL UNIQUE,
                 description TEXT,
                 duration_days INTEGER,
                 cost INTEGER,
@@ -834,13 +855,12 @@ def init_reality_tables():
             )
         """)
         
-        template_count = conn.execute("SELECT COUNT(*) FROM challenge_templates").fetchone()[0]
-        if template_count == 0:
-            for name, desc, days, cost, exp, gold, icon in default_challenges:
-                conn.execute(
-                    "INSERT INTO challenge_templates (name, description, duration_days, cost, reward_exp, reward_gold, icon) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    (name, desc, days, cost, exp, gold, icon)
-                )
+        # 插入挑战模板（使用 INSERT OR IGNORE 避免重复）
+        for name, desc, days, cost, exp, gold, icon in default_challenges:
+            conn.execute(
+                "INSERT OR IGNORE INTO challenge_templates (name, description, duration_days, cost, reward_exp, reward_gold, icon) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                (name, desc, days, cost, exp, gold, icon)
+            )
 
 
 def get_reality_rewards(character_id: int) -> list:
