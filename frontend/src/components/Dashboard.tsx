@@ -76,6 +76,29 @@ function Dashboard({ data, onRefresh }: DashboardProps) {
     return colors[rarity] || '#9d9d9d';
   };
 
+  const formatActivityTime = (createdAt: string) => {
+    const date = new Date(createdAt);
+    const now = new Date();
+    
+    const isToday = date.toDateString() === now.toDateString();
+    
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+    
+    const timeStr = date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    
+    if (isToday) {
+      return timeStr;
+    } else if (isYesterday) {
+      return `昨天 ${timeStr}`;
+    } else {
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${month}-${day} ${timeStr}`;
+    }
+  };
+
   return (
     <div className="dashboard">
       <header className="dashboard-header">
@@ -299,7 +322,7 @@ function Dashboard({ data, onRefresh }: DashboardProps) {
                   <span className="activity-type">{log.activity_type}</span>
                   <span className="activity-desc">{log.description}</span>
                   <span className="activity-time">
-                    {new Date(log.created_at).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                    {formatActivityTime(log.created_at)}
                   </span>
                 </div>
               ))}

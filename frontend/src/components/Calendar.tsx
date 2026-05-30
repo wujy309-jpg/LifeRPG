@@ -9,6 +9,7 @@ interface CalendarProps {
 export default function Calendar({ onDateSelect, selectedDate }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewDate, setViewDate] = useState(new Date());
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -100,7 +101,7 @@ export default function Calendar({ onDateSelect, selectedDate }: CalendarProps) 
   };
 
   return (
-    <div className="calendar-container">
+    <div className={`calendar-container ${collapsed ? 'collapsed' : ''}`}>
       <div className="calendar-header">
         <button className="nav-btn" onClick={prevMonth}>‹</button>
         <div className="month-year">
@@ -108,23 +109,34 @@ export default function Calendar({ onDateSelect, selectedDate }: CalendarProps) 
           <span className="year">{year}</span>
         </div>
         <button className="nav-btn" onClick={nextMonth}>›</button>
-      </div>
-      
-      <div className="calendar-weekdays">
-        {weekDays.map(day => (
-          <div key={day} className="weekday">{day}</div>
-        ))}
-      </div>
-      
-      <div className="calendar-days">
-        {renderDays()}
-      </div>
-      
-      <div className="calendar-footer">
-        <button className="today-btn" onClick={goToToday}>
-            回到今天
+        <button 
+          className="collapse-btn" 
+          onClick={() => setCollapsed(!collapsed)}
+          title={collapsed ? '展开日历' : '收起日历'}
+        >
+          {collapsed ? '▼' : '▲'}
         </button>
       </div>
+      
+      {!collapsed && (
+        <>
+          <div className="calendar-weekdays">
+            {weekDays.map(day => (
+              <div key={day} className="weekday">{day}</div>
+            ))}
+          </div>
+          
+          <div className="calendar-days">
+            {renderDays()}
+          </div>
+          
+          <div className="calendar-footer">
+            <button className="today-btn" onClick={goToToday}>
+                回到今天
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

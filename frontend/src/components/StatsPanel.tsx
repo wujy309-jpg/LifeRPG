@@ -3,6 +3,7 @@ import { getActivityStats, getActivityHistory, getAttributeHistory, getWeeklyAct
 import type { ActivityStats, ActivityHistory, AttributeHistory } from '../services/api';
 import ActivityChart from './ActivityChart';
 import AttributeChart from './AttributeChart';
+import { GameIcon, ICONS } from './GameIcons';
 import './StatsPanel.css';
 
 interface StatsPanelProps {
@@ -15,6 +16,7 @@ export default function StatsPanel({ characterId }: StatsPanelProps) {
   const [attributeHistory, setAttributeHistory] = useState<AttributeHistory[]>([]);
   const [weeklyTypes, setWeeklyTypes] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<7 | 14 | 30>(30);
 
   useEffect(() => {
@@ -24,6 +26,7 @@ export default function StatsPanel({ characterId }: StatsPanelProps) {
   const loadStats = async () => {
     try {
       setLoading(true);
+      setError(null);
       const [statsData, historyData, attrData, typesData] = await Promise.all([
         getActivityStats(characterId),
         getActivityHistory(characterId, timeRange),
@@ -34,25 +37,27 @@ export default function StatsPanel({ characterId }: StatsPanelProps) {
       setActivityHistory(historyData);
       setAttributeHistory(attrData);
       setWeeklyTypes(typesData);
-    } catch (e) {
+    } catch (e: any) {
       console.error('加载统计数据失败:', e);
+      setError(e?.response?.data?.detail || e?.message || '加载统计数据失败');
     } finally {
       setLoading(false);
     }
   };
 
   const getActivityTypeIcon = (type: string) => {
-    const icons: Record<string, string> = {
-      '学习': ' ',
-      '运动': ' ️',
-      '编程': '  ',
-      '社交': ' ',
-      '工作': ' ',
-      '创作': ' ',
-      '生活': ' ',
-      '休息': ' '
+    const iconMap: Record<string, { icon: string; color: string }> = {
+      '学习': { icon: ICONS.study, color: '#3b82f6' },
+      '运动': { icon: ICONS.exercise, color: '#ef4444' },
+      '编程': { icon: ICONS.coding, color: '#22c55e' },
+      '社交': { icon: ICONS.social, color: '#a855f7' },
+      '工作': { icon: ICONS.work, color: '#f59e0b' },
+      '创作': { icon: ICONS.creative, color: '#ec4899' },
+      '生活': { icon: ICONS.lifestyle, color: '#14b8a6' },
+      '休息': { icon: ICONS.rest, color: '#6366f1' }
     };
-    return icons[type] || ' ';
+    const item = iconMap[type] || { icon: ICONS.activity, color: '#6b7280' };
+    return <GameIcon icon={item.icon} size={20} color={item.color} />;
   };
 
   const getActivityTypeName = (type: string) => {
@@ -71,6 +76,16 @@ export default function StatsPanel({ characterId }: StatsPanelProps) {
 
   if (loading) {
     return <div className="loading">加载统计数据...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="stats-error">
+        <div className="error-icon">⚠️</div>
+        <div className="error-message">{error}</div>
+        <button className="retry-btn" onClick={loadStats}>重试</button>
+      </div>
+    );
   }
 
   if (!stats) {
@@ -106,42 +121,54 @@ export default function StatsPanel({ characterId }: StatsPanelProps) {
       {/* 统计卡片 */}
       <div className="stats-cards">
         <div className="stat-card">
-          <div className="stat-icon"> </div>
+          <div className="stat-icon">
+            <GameIcon icon={ICONS.activity} size={24} color="#3b82f6" />
+          </div>
           <div className="stat-info">
             <span className="stat-value">{stats.total_count}</span>
             <span className="stat-label">总活动次数</span>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon"> </div>
+          <div className="stat-icon">
+            <GameIcon icon={ICONS.scroll} size={24} color="#22c55e" />
+          </div>
           <div className="stat-info">
             <span className="stat-value">{stats.today_count}</span>
             <span className="stat-label">今日活动</span>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon"> </div>
+          <div className="stat-icon">
+            <GameIcon icon={ICONS.quest} size={24} color="#a855f7" />
+          </div>
           <div className="stat-info">
             <span className="stat-value">{stats.week_count}</span>
             <span className="stat-label">本周活动</span>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon"> ️</div>
+          <div className="stat-icon">
+            <GameIcon icon={ICONS.level} size={24} color="#f59e0b" />
+          </div>
           <div className="stat-info">
             <span className="stat-value">{stats.consecutive_days}</span>
             <span className="stat-label">连续天数</span>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon">⭐</div>
+          <div className="stat-icon">
+            <GameIcon icon={ICONS.exp} size={24} color="#10b981" />
+          </div>
           <div className="stat-info">
             <span className="stat-value">{stats.total_exp.toLocaleString()}</span>
             <span className="stat-label">总经验值</span>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon"> </div>
+          <div className="stat-icon">
+            <GameIcon icon={ICONS.gold} size={24} color="#f59e0b" />
+          </div>
           <div className="stat-info">
             <span className="stat-value">{stats.total_gold.toLocaleString()}</span>
             <span className="stat-label">总金币</span>

@@ -502,7 +502,7 @@ async def api_status():
 # ============ 统计 API ============
 
 @app.get("/api/stats/{character_id}")
-async def api_get_stats(character_id: int):
+def api_get_stats(character_id: int):
     """获取角色统计数据"""
     character = get_character(character_id)
     if not character:
@@ -513,7 +513,7 @@ async def api_get_stats(character_id: int):
 
 
 @app.get("/api/stats/{character_id}/history")
-async def api_get_activity_history(character_id: int, days: int = 30):
+def api_get_activity_history(character_id: int, days: int = 30):
     """获取活动历史"""
     character = get_character(character_id)
     if not character:
@@ -524,7 +524,7 @@ async def api_get_activity_history(character_id: int, days: int = 30):
 
 
 @app.get("/api/stats/{character_id}/attributes")
-async def api_get_attribute_history(character_id: int, days: int = 30):
+def api_get_attribute_history(character_id: int, days: int = 30):
     """获取属性变化历史"""
     character = get_character(character_id)
     if not character:
@@ -535,7 +535,7 @@ async def api_get_attribute_history(character_id: int, days: int = 30):
 
 
 @app.get("/api/stats/{character_id}/weekly-types")
-async def api_get_weekly_types(character_id: int):
+def api_get_weekly_types(character_id: int):
     """获取本周活动类型统计"""
     character = get_character(character_id)
     if not character:

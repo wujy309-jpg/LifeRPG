@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { logActivity } from '../services/api';
 import type { GameFeedback } from '../services/api';
+import { GameIcon, ICONS } from './GameIcons';
 import './ActivityLog.css';
 
 interface ActivityLogProps {
@@ -40,14 +41,14 @@ function ActivityLog({ characterId, onActivityLogged }: ActivityLogProps) {
   };
 
   const activityPresets = [
-    { icon: ' ', label: '学习', desc: '去上课/看书/复习' },
-    { icon: ' ️', label: '运动', desc: '健身/跑步/打球' },
-    { icon: ' ', label: '编程', desc: '写代码/Debug' },
-    { icon: ' ', label: '社交', desc: '聚会/聊天' },
-    { icon: ' ', label: '工作', desc: '上班/开会' },
-    { icon: ' ', label: '创作', desc: '画画/写作/设计' },
-    { icon: ' ', label: '生活', desc: '做饭/打扫' },
-    { icon: ' ', label: '休息', desc: '睡觉/放松' },
+    { icon: ICONS.study, label: '学习', desc: '去上课/看书/复习', color: '#3b82f6' },
+    { icon: ICONS.exercise, label: '运动', desc: '健身/跑步/打球', color: '#ef4444' },
+    { icon: ICONS.coding, label: '编程', desc: '写代码/Debug', color: '#22c55e' },
+    { icon: ICONS.social, label: '社交', desc: '聚会/聊天', color: '#a855f7' },
+    { icon: ICONS.work, label: '工作', desc: '上班/开会', color: '#f59e0b' },
+    { icon: ICONS.creative, label: '创作', desc: '画画/写作/设计', color: '#ec4899' },
+    { icon: ICONS.lifestyle, label: '生活', desc: '做饭/打扫', color: '#14b8a6' },
+    { icon: ICONS.rest, label: '休息', desc: '睡觉/放松', color: '#6366f1' },
   ];
 
   return (
@@ -82,8 +83,11 @@ function ActivityLog({ characterId, onActivityLogged }: ActivityLogProps) {
               key={preset.label}
               className="preset-btn"
               onClick={() => setDescription(preset.desc)}
+              style={{ '--preset-color': preset.color } as React.CSSProperties}
             >
-              <span className="preset-icon">{preset.icon}</span>
+              <span className="preset-icon">
+                <GameIcon icon={preset.icon} size={24} color={preset.color} />
+              </span>
               <span className="preset-label">{preset.label}</span>
             </button>
           ))}

@@ -205,9 +205,11 @@
 }
 
 .stat-icon {
-  font-size: 22px;
   width: 28px;
-  text-align: center;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .stat-name {

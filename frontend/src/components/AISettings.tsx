@@ -114,6 +114,7 @@ export default function AISettings({ onClose }: AISettingsProps) {
       openai: ' ',
       claude: ' ',
       deepseek: ' ',
+      mimo: ' ',
       custom: '⚙️'
     };
     return icons[providerName] || ' ';

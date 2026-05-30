@@ -261,3 +261,41 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* 错误状态 */
+.stats-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.error-message {
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin-bottom: 24px;
+  max-width: 400px;
+}
+
+.retry-btn {
+  padding: 10px 24px;
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.retry-btn:hover {
+  opacity: 0.8;
+  transform: translateY(-2px);
+}

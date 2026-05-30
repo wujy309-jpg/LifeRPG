@@ -1,5 +1,6 @@
 import type { CharacterFull } from '../services/api';
 import RadarChart from './RadarChart';
+import { StrengthIcon, IntelligenceIcon, AgilityIcon, CharismaIcon, WillpowerIcon } from './GameIcons';
 import './CharacterSheet.css';
 
 interface CharacterSheetProps {
@@ -10,12 +11,23 @@ function CharacterSheet({ data }: CharacterSheetProps) {
   const { character, level_title, next_level_exp, titles } = data;
 
   const stats = [
-    { name: '力量', value: character.strength, icon: ' ', color: '#ff6b6b', desc: '身体素质、运动能力' },
-    { name: '智力', value: character.intelligence, icon: ' ', color: '#4ecdc4', desc: '学习能力、逻辑思维' },
-    { name: '敏捷', value: character.agility, icon: ' ', color: '#45b7d1', desc: '反应速度、灵活性' },
-    { name: '魅力', value: character.charisma, icon: ' ', color: '#f9ca24', desc: '社交能力、领导力' },
-    { name: '意志', value: character.willpower, icon: ' ️', color: '#a55eea', desc: '毅力、自控力' },
+    { name: '力量', value: character.strength, icon: 'strength', color: '#ef4444', desc: '身体素质、运动能力' },
+    { name: '智力', value: character.intelligence, icon: 'intelligence', color: '#3b82f6', desc: '学习能力、逻辑思维' },
+    { name: '敏捷', value: character.agility, icon: 'agility', color: '#22c55e', desc: '反应速度、灵活性' },
+    { name: '魅力', value: character.charisma, icon: 'charisma', color: '#a855f7', desc: '社交能力、领导力' },
+    { name: '意志', value: character.willpower, icon: 'willpower', color: '#f59e0b', desc: '毅力、自控力' },
   ];
+
+  const renderStatIcon = (iconName: string, color: string) => {
+    const iconMap: Record<string, React.ReactNode> = {
+      strength: <StrengthIcon size={20} />,
+      intelligence: <IntelligenceIcon size={20} />,
+      agility: <AgilityIcon size={20} />,
+      charisma: <CharismaIcon size={20} />,
+      willpower: <WillpowerIcon size={20} />,
+    };
+    return <span className="stat-icon" style={{ color }}>{iconMap[iconName] || null}</span>;
+  };
 
   const totalStats = stats.reduce((sum, s) => sum + s.value, 0);
   const maxStat = Math.max(...stats.map(s => s.value));
@@ -77,7 +89,7 @@ function CharacterSheet({ data }: CharacterSheetProps) {
             {stats.map(stat => (
               <div key={stat.name} className="stat-row">
                 <div className="stat-header">
-                  <span className="stat-icon">{stat.icon}</span>
+                  {renderStatIcon(stat.icon, stat.color)}
                   <span className="stat-name">{stat.name}</span>
                   <span className="stat-value" style={{ color: stat.color }}>{stat.value}</span>
                 </div>
