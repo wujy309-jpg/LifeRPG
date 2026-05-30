@@ -13,18 +13,21 @@ function ActivityLog({ characterId, onActivityLogged }: ActivityLogProps) {
   const [description, setDescription] = useState('');
   const [feedback, setFeedback] = useState<GameFeedback | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (!description.trim()) return;
     setSubmitting(true);
+    setError(null);
     try {
       const result = await logActivity(characterId, description);
       setFeedback(result);
       setDescription('');
       onActivityLogged();
-    } catch (e) {
+    } catch (e: any) {
       console.error('记录失败:', e);
-      alert('记录失败，请重试');
+      const errorMsg = e.response?.data?.detail || e.message || '记录失败，请重试';
+      setError(errorMsg);
     } finally {
       setSubmitting(false);
     }
@@ -71,8 +74,13 @@ function ActivityLog({ characterId, onActivityLogged }: ActivityLogProps) {
           onClick={handleSubmit}
           disabled={submitting || !description.trim()}
         >
-          {submitting ? 'AI 分析中...' : '提交记录'}
+          {submitting ? '⏳ AI 分析中...' : '⚔️ 提交记录'}
         </button>
+        {error && (
+          <div className="error-message">
+            ❌ {error}
+          </div>
+        )}
       </div>
 
       <div className="presets-section">
