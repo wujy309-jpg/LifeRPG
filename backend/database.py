@@ -698,7 +698,7 @@ def init_reality_tables():
         conn.executescript("""
             CREATE TABLE IF NOT EXISTS reality_rewards (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                character_id INTEGER NOT NULL,
+                character_id INTEGER DEFAULT 0,
                 name TEXT NOT NULL,
                 description TEXT,
                 category TEXT DEFAULT 'entertainment',
@@ -706,8 +706,7 @@ def init_reality_tables():
                 icon TEXT DEFAULT ' ',
                 is_custom BOOLEAN DEFAULT 0,
                 times_redeemed INTEGER DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (character_id) REFERENCES characters(id)
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
             CREATE TABLE IF NOT EXISTS habit_challenges (
@@ -724,8 +723,7 @@ def init_reality_tables():
                 end_date DATE,
                 check_in_days INTEGER DEFAULT 0,
                 last_check_in DATE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (character_id) REFERENCES characters(id)
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
             CREATE TABLE IF NOT EXISTS immunity_cards (
@@ -736,8 +734,7 @@ def init_reality_tables():
                 cost INTEGER NOT NULL,
                 uses_remaining INTEGER DEFAULT 1,
                 card_type TEXT DEFAULT 'skip_task',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (character_id) REFERENCES characters(id)
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
             CREATE TABLE IF NOT EXISTS penalty_log (
