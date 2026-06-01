@@ -18,13 +18,16 @@ from database import (
     init_reality_tables, get_reality_rewards, add_custom_reward, redeem_reward,
     get_habit_challenges, create_habit_challenge, check_in_challenge,
     get_immunity_cards, buy_immunity_card, check_penalty, get_penalty_history,
-    get_challenge_templates
+    get_challenge_templates,
+    check_in, get_check_in_status,
+    get_activity_templates, add_activity_template, delete_activity_template, use_activity_template
 )
 from game_engine import (
     classify_activity, calculate_exp_gain, calculate_gold_gain,
     calculate_attribute_changes, check_level_up, generate_equipment,
     generate_title, generate_quests, generate_all_quests, get_level_title, exp_for_level,
-    get_rarity_color, get_attribute_level, get_attribute_progress
+    get_rarity_color, get_attribute_level, get_attribute_progress,
+    classify_negative_activity, apply_attribute_penalty, ATTRIBUTE_MIN
 )
 from ai_service import (
     chat_with_ai, check_ai_status, list_models, generate_daily_summary,
@@ -152,6 +155,97 @@ async def api_get_character_full(character_id: int):
 
 # ============ 活动 API ============
 
+def _generate_negative_comment(activity_type: str, severity: str) -> str:
+    """生成负面活动的吐槽评论"""
+    comments = {
+        "沉迷游戏": {
+            "high": [
+                "好家伙，一上午就献给游戏了？你的意志力正在疯狂掉血啊！建议下次设个闹钟，2小时就停",
+                "游戏打了一上午？你的意志力已经被BOSS击败了！需要回城补给了",
+                "一上午游戏，你的意志力已经破产了！建议去意志力商店充值（起来活动活动）"
+            ],
+            "medium": [
+                "打了这么久游戏？你的意志力正在掉血，建议适可而止",
+                "游戏时间到！你的意志力提醒你该休息了"
+            ],
+            "low": [
+                "稍微放松一下可以，但别沉迷哦~"
+            ]
+        },
+        "刷短视频": {
+            "high": [
+                "刷了一下午抖音？短视频的魔力太大了，你的意志力已经被吞噬",
+                "短视频停不下来？你的意志力正在被算法控制！快醒醒"
+            ],
+            "medium": [
+                "刷了这么久视频？你的意志力在默默流泪...",
+                "短视频的黑洞效应太强了，注意时间！"
+            ],
+            "low": [
+                "稍微刷一下放松可以，别停不下来哦~"
+            ]
+        },
+        "熬夜": {
+            "high": [
+                "熬夜冠军就是你！不过你的力量和意志都在默默流泪...",
+                "通宵一时爽，第二天火葬场！你的身体在抗议了",
+                "熬夜一时爽，一直熬夜一直...掉属性！快去睡觉"
+            ],
+            "medium": [
+                "又熬夜了？你的意志力和力量都在掉血啊",
+                "晚睡对身体不好哦，早点休息明天才能满血复活"
+            ],
+            "low": [
+                "稍微晚一点没事，但别太晚哦~"
+            ]
+        },
+        "拖延偷懒": {
+            "high": [
+                "拖延症晚期患者！你的意志力已经降到谷底了",
+                "一整天啥也没干？你的意志力正在疯狂掉血！快行动起来",
+                "拖延一时爽，一直拖延...你的意志力已经破产了"
+            ],
+            "medium": [
+                "又拖延了？你的意志力在默默流泪...",
+                "拖延是意志力的天敌！快行动起来"
+            ],
+            "low": [
+                "稍微休息一下可以，别一直拖延哦~"
+            ]
+        },
+        "不健康饮食": {
+            "high": [
+                "暴饮暴食？你的力量在默默流泪...",
+                "垃圾食品吃太多？身体在抗议了！"
+            ],
+            "medium": [
+                "又吃垃圾食品了？注意健康饮食哦",
+                "偶尔放纵一下可以，别太频繁"
+            ],
+            "low": [
+                "偶尔吃点零食没事，注意均衡饮食~"
+            ]
+        },
+        "过度社交": {
+            "high": [
+                "水群一上午？你的意志力正在被群消息淹没",
+                "无意义社交太多了，你的意志力在掉血"
+            ],
+            "medium": [
+                "水群这么久？注意时间管理哦",
+                "社交可以，但别太浪费时间"
+            ],
+            "low": [
+                "稍微聊聊天放松可以，别太沉迷哦~"
+            ]
+        }
+    }
+    
+    activity_comments = comments.get(activity_type, {})
+    severity_comments = activity_comments.get(severity, activity_comments.get("medium", ["注意控制时间哦~"]))
+    return random.choice(severity_comments)
+
+
 @app.post("/api/activity/{character_id}", response_model=GameFeedback)
 async def api_log_activity(character_id: int, data: ActivityInput):
     """记录活动并获取游戏化反馈"""
@@ -164,11 +258,22 @@ async def api_log_activity(character_id: int, data: ActivityInput):
     # 尝试AI分析，失败则用本地逻辑
     ai_result = None
     ai_comment = None
+    is_negative = False
+    negative_activity = None
+    
+    # 先检查是否是负面活动（本地关键词匹配）
+    negative_activity = classify_negative_activity(data.description)
+    
     try:
         # 设置30秒超时，AI响应慢时快速降级到本地逻辑
         ai_result = await asyncio.wait_for(chat_with_ai(data.description, character), timeout=30.0)
         if ai_result:
             ai_comment = ai_result.get("comment")
+            # 检查AI是否识别为负面活动（属性变化中有负值）
+            ai_attr_changes = ai_result.get("attribute_changes", {})
+            has_negative_attr = any(v < 0 for v in ai_attr_changes.values())
+            if has_negative_attr:
+                is_negative = True
     except asyncio.TimeoutError:
         print("AI响应超时，使用本地逻辑")
         ai_result = None
@@ -177,7 +282,11 @@ async def api_log_activity(character_id: int, data: ActivityInput):
         ai_result = None
 
     # 确定活动类型
-    if data.activity_type:
+    if negative_activity:
+        # 负面活动使用特殊类型
+        activity_type = negative_activity["activity_type"]
+        is_negative = True
+    elif data.activity_type:
         activity_type = data.activity_type
     elif ai_result and ai_result.get("activity_type"):
         activity_type = ai_result["activity_type"]
@@ -185,7 +294,15 @@ async def api_log_activity(character_id: int, data: ActivityInput):
         activity_type = classify_activity(data.description)
 
     # 计算收益
-    if ai_result and ai_result.get("exp_gained"):
+    if is_negative and negative_activity:
+        # 负面活动：使用本地负面活动配置
+        exp_gained = negative_activity["exp"]
+        gold_gained = negative_activity["gold"]
+        attribute_changes = negative_activity["penalty"]
+        if not ai_comment:
+            # 生成负面活动的吐槽评论
+            ai_comment = _generate_negative_comment(negative_activity["activity_type"], negative_activity["severity"])
+    elif ai_result and ai_result.get("exp_gained"):
         exp_gained = ai_result["exp_gained"]
         gold_gained = ai_result.get("gold_gained", 10)
         attribute_changes = ai_result.get("attribute_changes", {})
@@ -207,7 +324,7 @@ async def api_log_activity(character_id: int, data: ActivityInput):
     new_level, remaining_exp = check_level_up(new_exp, character["level"])
     level_up = new_level > old_level
 
-    # 应用属性变化
+    # 应用属性变化（确保属性不低于最低值）
     updates = {
         "exp": remaining_exp,
         "gold": new_gold,
@@ -215,7 +332,9 @@ async def api_log_activity(character_id: int, data: ActivityInput):
     }
     for attr, change in attribute_changes.items():
         if attr in character and isinstance(character[attr], (int, float)):
-            updates[attr] = character[attr] + change
+            new_value = character[attr] + change
+            # 属性不能低于最低值
+            updates[attr] = max(new_value, ATTRIBUTE_MIN)
 
     character = update_character(character_id, **updates)
 
@@ -489,6 +608,70 @@ async def api_daily_summary(character_id: int):
     )
 
 
+# ============ 签到 API ============
+
+@app.post("/api/checkin/{character_id}")
+async def api_check_in(character_id: int):
+    """每日签到"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    
+    result = check_in(character_id)
+    return result
+
+
+@app.get("/api/checkin/status/{character_id}")
+async def api_check_in_status(character_id: int):
+    """获取签到状态"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    
+    return get_check_in_status(character_id)
+
+
+# ============ 活动模板 API ============
+
+@app.get("/api/templates/{character_id}")
+async def api_get_templates(character_id: int):
+    """获取活动模板列表"""
+    return get_activity_templates(character_id)
+
+
+@app.post("/api/templates/{character_id}")
+async def api_add_template(character_id: int, data: dict):
+    """添加活动模板"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    
+    name = data.get("name", "")
+    description = data.get("description", "")
+    activity_type = data.get("activity_type")
+    
+    if not name or not description:
+        raise HTTPException(status_code=400, detail="名称和描述不能为空")
+    
+    return add_activity_template(character_id, name, description, activity_type)
+
+
+@app.delete("/api/templates/{template_id}")
+async def api_delete_template(template_id: int):
+    """删除活动模板"""
+    delete_activity_template(template_id)
+    return {"message": "删除成功"}
+
+
+@app.post("/api/templates/use/{template_id}")
+async def api_use_template(template_id: int):
+    """使用活动模板"""
+    template = use_activity_template(template_id)
+    if not template:
+        raise HTTPException(status_code=404, detail="模板不存在")
+    return template
+
+
 # ============ 系统 API ============
 
 @app.get("/api/status")
@@ -526,6 +709,55 @@ def api_get_activity_history(character_id: int, days: int = 30):
     
     history = get_activity_history(character_id, days)
     return {"history": history, "days": days}
+
+
+# ============ 数据导出 API ============
+
+@app.get("/api/export/{character_id}")
+def api_export_data(character_id: int, format: str = "json"):
+    """导出角色数据
+    
+    format: json 或 csv
+    """
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    
+    # 获取所有相关数据
+    activity_logs = get_activity_logs(character_id, limit=10000)
+    equipment = get_equipment(character_id)
+    titles = get_titles(character_id)
+    quests = get_quests(character_id)
+    
+    export_data = {
+        "character": dict(character),
+        "activity_logs": activity_logs,
+        "equipment": equipment,
+        "titles": titles,
+        "quests": quests,
+        "exported_at": datetime.now().isoformat()
+    }
+    
+    if format == "csv":
+        # CSV格式只导出活动记录
+        import csv
+        import io
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["日期", "类型", "描述", "经验", "金币", "属性变化", "AI反馈"])
+        for log in activity_logs:
+            writer.writerow([
+                log.get("created_at", ""),
+                log.get("activity_type", ""),
+                log.get("description", ""),
+                log.get("exp_gained", 0),
+                log.get("gold_gained", 0),
+                log.get("attribute_changes", "{}"),
+                log.get("ai_feedback", "")
+            ])
+        return {"format": "csv", "data": output.getvalue()}
+    
+    return export_data
 
 
 @app.get("/api/stats/{character_id}/attributes")
@@ -677,7 +909,7 @@ async def api_get_character_attributes(character_id: int):
     return {
         "character_id": character_id,
         "attributes": attributes,
-        "total_stats": sum(character.get(attr, 10) for attr in ATTRIBUTES.keys())
+        "total_stats": round(sum(character.get(attr, 10) for attr in ATTRIBUTES.keys()) / 5)
     }
 
 

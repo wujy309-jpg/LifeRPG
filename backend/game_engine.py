@@ -21,32 +21,159 @@ ATTRIBUTES = {
     "willpower": {"name": "意志", "icon": " ️", "desc": "毅力、自控力、专注力、决心"},
 }
 
-# 属性等级定义
+# 属性等级定义（按 0-100 范围划分）
 ATTRIBUTE_LEVELS = [
-    (1, 5, "薄弱"),
-    (6, 10, "普通"),
-    (11, 15, "良好"),
-    (16, 20, "优秀"),
-    (21, 25, "精英"),
-    (26, 30, "大师"),
-    (31, 100, "传说"),
+    (1, 30, "薄弱"),
+    (31, 45, "普通"),
+    (46, 60, "良好"),
+    (61, 75, "优秀"),
+    (76, 85, "精英"),
+    (86, 95, "大师"),
+    (96, 100, "传说"),
 ]
 
 # 属性上限
-ATTRIBUTE_SOFT_CAP = 50  # 超过后提升速度减半
+ATTRIBUTE_SOFT_CAP = 75  # 超过后提升速度减半
 ATTRIBUTE_HARD_CAP = 100
-ATTRIBUTE_INITIAL = 10
+ATTRIBUTE_INITIAL = 50   # 初始属性基础值
 
 # 属性成长曲线配置
 # 使用对数衰减模型，属性越高提升越难
+# 初始约50-65，提升到100需要长期积累
 ATTRIBUTE_GROWTH_CONFIG = {
     # 属性区间: (基础概率, 最大提升值)
-    (1, 20): (1.0, 2),      # 初期：容易提升，最多+2
-    (21, 40): (0.7, 2),     # 中期：概率降低
-    (41, 60): (0.4, 1),     # 后期：很难提升
-    (61, 80): (0.2, 1),     # 高级：极难提升
-    (81, 100): (0.1, 1),    # 大师：每次+1都很难
+    (40, 55): (0.8, 3),     # 初期：容易提升，最多+3
+    (56, 65): (0.6, 2),     # 中前期：概率降低，最多+2
+    (66, 75): (0.4, 2),     # 中期：较难提升
+    (76, 85): (0.3, 1),     # 中后期：很难提升
+    (86, 95): (0.2, 1),     # 高级：极难提升
+    (96, 100): (0.1, 1),    # 大师：每次+1都很难
 }
+
+
+# ============ 属性下限 ============
+ATTRIBUTE_MIN = 10  # 属性最低值，不能降到10以下
+
+# ============ 负面活动配置 ============
+NEGATIVE_ACTIVITIES = {
+    "沉迷游戏": {
+        "keywords": ["打游戏", "玩游戏", "游戏一上午", "游戏一下午", "游戏几小时", "王者荣耀", "吃鸡", "LOL", "原神", "崩铁", "steam", "游戏停不下来"],
+        "penalty": {"willpower": -2},
+        "exp": 5,
+        "gold": 2,
+        "severity": "high"  # high: 3小时+, medium: 1-3小时, low: <1小时
+    },
+    "刷短视频": {
+        "keywords": ["刷抖音", "刷视频", "刷短视频", "抖音", "快手", "B站", "小红书", "刷手机", "停不下来"],
+        "penalty": {"willpower": -1},
+        "exp": 5,
+        "gold": 2,
+        "severity": "medium"
+    },
+    "熬夜": {
+        "keywords": ["熬夜", "通宵", "晚睡", "凌晨", "不睡觉"],
+        "penalty": {"willpower": -1, "strength": -1},
+        "exp": 3,
+        "gold": 1,
+        "severity": "high"
+    },
+    "拖延偷懒": {
+        "keywords": ["拖延", "偷懒", "摸鱼", "无所事事", "发呆一整天", "啥也没干", "浪费时间"],
+        "penalty": {"willpower": -2},
+        "exp": 2,
+        "gold": 1,
+        "severity": "high"
+    },
+    "不健康饮食": {
+        "keywords": ["垃圾食品", "暴饮暴食", "吃太多", "零食", "奶茶", "炸鸡", "外卖"],
+        "penalty": {"strength": -1},
+        "exp": 3,
+        "gold": 1,
+        "severity": "low"
+    },
+    "过度社交": {
+        "keywords": ["水群", "聊天几小时", "无意义社交", "闲聊"],
+        "penalty": {"willpower": -1},
+        "exp": 3,
+        "gold": 1,
+        "severity": "medium"
+    },
+}
+
+def classify_negative_activity(description: str) -> Optional[Dict]:
+    """识别负面活动，返回负面活动配置或None"""
+    import re
+    desc_lower = description.lower()
+    
+    for activity_name, config in NEGATIVE_ACTIVITIES.items():
+        # 先尝试精确匹配
+        matched = False
+        for keyword in config["keywords"]:
+            if keyword in desc_lower:
+                matched = True
+                break
+        
+        # 如果精确匹配失败，尝试模式匹配
+        if not matched:
+            # 定义模式匹配规则
+            pattern_rules = {
+                "沉迷游戏": [r"打.{0,3}游戏", r"玩.{0,3}游戏", r"游戏.{0,5}", r"打.{0,3}王者", r"打.{0,3}吃鸡"],
+                "刷短视频": [r"刷.{0,3}视频", r"刷.{0,3}抖音", r"看.{0,3}视频"],
+                "熬夜": [r"熬.{0,3}夜", r"通.{0,3}宵", r"晚.{0,3}睡", r"凌晨.{0,5}不睡"],
+                "拖延偷懒": [r"拖.{0,3}延", r"偷.{0,3}懒", r"摸.{0,3}鱼", r"浪费.{0,5}时间"],
+                "不健康饮食": [r"吃.{0,3}垃圾食品", r"暴.{0,3}饮暴.{0,3}食", r"吃.{0,3}太多"],
+                "过度社交": [r"水.{0,3}群", r"聊.{0,5}小时", r"闲.{0,3}聊"],
+            }
+            
+            patterns = pattern_rules.get(activity_name, [])
+            for pattern in patterns:
+                if re.search(pattern, desc_lower):
+                    matched = True
+                    break
+        
+        if matched:
+            # 根据描述中的时间信息调整惩罚程度
+            penalty = config["penalty"].copy()
+            exp = config["exp"]
+            gold = config["gold"]
+            
+            # 检测时间长度关键词
+            time_indicators = {
+                "high": ["一上午", "一下午", "一整天", "几小时", "3小时", "4小时", "5小时", "6小时", "半天"],
+                "medium": ["1小时", "2小时", "一会", "一会儿"],
+                "low": ["一会", "半小时", "30分钟"]
+            }
+            
+            severity = config["severity"]
+            for level, indicators in time_indicators.items():
+                for indicator in indicators:
+                    if indicator in desc_lower:
+                        severity = level
+                        break
+            
+            # 根据严重程度调整惩罚
+            if severity == "high":
+                penalty = {k: v * 2 for k, v in penalty.items()}
+                exp = max(exp - 3, 1)
+                gold = max(gold - 1, 1)
+            elif severity == "low":
+                penalty = {k: int(v * 0.5) for k, v in penalty.items()}
+                penalty = {k: max(v, -1) for k, v in penalty.items()}
+            
+            return {
+                "activity_type": activity_name,
+                "penalty": penalty,
+                "exp": exp,
+                "gold": gold,
+                "severity": severity
+            }
+    
+    return None
+
+def apply_attribute_penalty(current_value: int, penalty: int) -> int:
+    """应用属性惩罚，确保不低于最低值"""
+    new_value = current_value + penalty
+    return max(new_value, ATTRIBUTE_MIN)
 
 
 # ============ 活动配置 ============
@@ -501,38 +628,70 @@ TITLE_POOL = {
         {"name": "熬夜冠军", "desc": "睡眠是什么？能吃吗？", "condition": "0-6点记录活动"},
         {"name": "早起鸟儿", "desc": "比太阳起得还早", "condition": "6-8点记录活动"},
         {"name": "夜猫子", "desc": "夜晚才是我的主场", "condition": "22-24点记录活动"},
+        {"name": "午间战士", "desc": "午休时间也不放过", "condition": "12-14点记录活动"},
     ],
     # 活动称号
     "学习": [
         {"name": "学霸附体", "desc": "今天学习状态爆表", "condition": "记录学习活动"},
         {"name": "知识收割机", "desc": "疯狂吸收知识中", "condition": "记录学习活动"},
         {"name": "图书馆常客", "desc": "书山有路勤为径", "condition": "记录10次学习"},
+        {"name": "学神", "desc": "知识就是力量", "condition": "记录50次学习"},
+        {"name": "终身学习者", "desc": "活到老学到老", "condition": "记录100次学习"},
     ],
     "运动": [
         {"name": "健身狂人", "desc": "汗水就是我的勋章", "condition": "记录运动活动"},
         {"name": "钢铁之躯", "desc": "身体就是最好的武器", "condition": "记录运动活动"},
         {"name": "马拉松选手", "desc": "坚持就是胜利", "condition": "记录10次运动"},
+        {"name": "运动达人", "desc": "生命在于运动", "condition": "记录50次运动"},
+        {"name": "铁人", "desc": "超越极限", "condition": "记录100次运动"},
     ],
     "编程": [
         {"name": "凌晨两点还在Debug的人", "desc": "代码就是我的生命", "condition": "记录编程活动"},
         {"name": "Bug猎人", "desc": "专门捕猎野生Bug", "condition": "记录编程活动"},
         {"name": "键盘侠", "desc": "用代码改变世界", "condition": "记录10次编程"},
         {"name": "全栈战士", "desc": "前后端通吃", "condition": "记录20次编程"},
+        {"name": "代码之神", "desc": "代码如诗", "condition": "记录50次编程"},
+        {"name": "架构师", "desc": "系统设计大师", "condition": "记录100次编程"},
     ],
     "社交": [
         {"name": "社交蝴蝶", "desc": "人见人爱花见花开", "condition": "记录社交活动"},
         {"name": "破冰专家", "desc": "没有我暖不了的场", "condition": "记录社交活动"},
+        {"name": "人脉王", "desc": "朋友多了路好走", "condition": "记录20次社交"},
     ],
     "工作": [
         {"name": "职场战士", "desc": "打工是不可能打工的...真香", "condition": "记录工作活动"},
         {"name": "加班达人", "desc": "老板看了都感动", "condition": "记录工作活动"},
+        {"name": "工作狂人", "desc": "热爱工作", "condition": "记录50次工作"},
+    ],
+    "创作": [
+        {"name": "灵感缪斯", "desc": "创意无限", "condition": "记录创作活动"},
+        {"name": "艺术大师", "desc": "用创作表达自我", "condition": "记录20次创作"},
+    ],
+    "生活": [
+        {"name": "生活达人", "desc": "把生活过成诗", "condition": "记录10次生活"},
+        {"name": "家务能手", "desc": "家里井井有条", "condition": "记录20次生活"},
     ],
     # 成就称号
     "achievement": [
+        {"name": "初出茅庐", "desc": "完成第一次活动记录", "condition": "记录1次活动"},
         {"name": "连续登录", "desc": "坚持就是胜利", "condition": "连续7天记录"},
-        {"name": "百小时", "desc": "时间的朋友", "condition": "累计100小时活动"},
-        {"name": "全能战士", "desc": "均衡发展", "condition": "五项属性均15+"},
+        {"name": "百次记录", "desc": "时间的朋友", "condition": "累计100次活动"},
+        {"name": "全能战士", "desc": "均衡发展", "condition": "五项属性均50+"},
         {"name": "不朽传说", "desc": "登峰造极", "condition": "达到50级"},
+        {"name": "签到达人", "desc": "风雨无阻", "condition": "连续签到30天"},
+        {"name": "属性大师", "desc": "某项属性达到90", "condition": "任意属性90+"},
+        {"name": "万能选手", "desc": "所有活动类型都尝试过", "condition": "8种活动类型各记录1次"},
+        {"name": "效率之王", "desc": "一天记录5次活动", "condition": "单日5次活动"},
+        {"name": "周末战士", "desc": "周末也不休息", "condition": "周末记录活动"},
+    ],
+    # 等级称号
+    "level": [
+        {"name": "新手冒险者", "desc": "刚刚开始旅程", "condition": "达到1级"},
+        {"name": "初级勇者", "desc": "小有成就", "condition": "达到5级"},
+        {"name": "中级战士", "desc": "实力渐长", "condition": "达到10级"},
+        {"name": "高级英雄", "desc": "众人敬仰", "condition": "达到20级"},
+        {"name": "传奇大师", "desc": "传说中的存在", "condition": "达到30级"},
+        {"name": "不朽传说", "desc": "超越凡人", "condition": "达到50级"},
     ],
 }
 

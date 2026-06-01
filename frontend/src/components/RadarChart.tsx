@@ -36,7 +36,7 @@ function RadarChart({
 
   const center = size / 2;
   const radius = size / 2 - 50;
-  const maxValue = 30; // 假设最大属性值为30
+  const maxValue = 100; // 属性最大值为100
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -271,7 +271,7 @@ function RadarChart({
     });
   };
 
-  const totalStats = Object.values(stats).reduce((a, b) => a + b, 0);
+  const totalStats = Math.round(Object.values(stats).reduce((a, b) => a + b, 0) / 5);
 
   return (
     <div className="radar-chart-container">

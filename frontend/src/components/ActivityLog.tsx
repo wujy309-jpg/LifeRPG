@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { logActivity } from '../services/api';
 import type { GameFeedback } from '../services/api';
 import { GameIcon, ICONS } from './GameIcons';
+import ActivityTemplates from './ActivityTemplates';
 import './ActivityLog.css';
 
 interface ActivityLogProps {
@@ -107,6 +108,9 @@ function ActivityLog({ characterId, onActivityLogged }: ActivityLogProps) {
           ))}
         </div>
       </div>
+
+      {/* 活动模板 */}
+      <ActivityTemplates characterId={characterId} onActivityLogged={onActivityLogged} />
 
       {/* 反馈弹窗 */}
       {showModal && feedback && (

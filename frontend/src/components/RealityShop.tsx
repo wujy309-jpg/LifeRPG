@@ -233,7 +233,10 @@ export default function RealityShop({ characterId, onRefresh }: RealityShopProps
                 </div>
                 <button 
                   className="redeem-btn"
-                  onClick={() => handleRedeemReward(reward.id)}
+                  onClick={() => {
+                    console.log('点击兑换按钮:', { gold, cost: reward.cost, disabled: gold < reward.cost });
+                    handleRedeemReward(reward.id);
+                  }}
                   disabled={gold < reward.cost}
                 >
                   兑换

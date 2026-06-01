@@ -1,0 +1,584 @@
+/* 浮动签到按钮 */
+.checkin-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border: 2px solid var(--border-dark);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.3),
+    0 0 20px var(--primary-glow);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 100;
+  animation: fab-pulse 2s ease-in-out infinite;
+}
+
+.checkin-fab::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.checkin-fab:hover {
+  transform: scale(1.15);
+  box-shadow: 
+    0 6px 25px rgba(0, 0, 0, 0.4),
+    0 0 30px var(--primary-glow);
+}
+
+.checkin-fab:hover::before {
+  opacity: 1;
+}
+
+.checkin-fab.checked {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border-color: #22c55e;
+  box-shadow: 
+    0 4px 15px rgba(34, 197, 94, 0.3),
+    0 0 20px rgba(34, 197, 94, 0.2);
+  animation: none;
+}
+
+.checkin-fab.checked:hover {
+  box-shadow: 
+    0 6px 25px rgba(34, 197, 94, 0.4),
+    0 0 30px rgba(34, 197, 94, 0.3);
+}
+
+@keyframes fab-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 4px 15px rgba(0, 0, 0, 0.3),
+      0 0 20px var(--primary-glow);
+  }
+  50% {
+    box-shadow: 
+      0 4px 15px rgba(0, 0, 0, 0.3),
+      0 0 30px var(--primary-glow),
+      0 0 40px var(--primary-glow);
+  }
+}
+
+.fab-icon {
+  font-size: 26px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.fab-streak {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg-darkest);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+  animation: streak-bounce 1s ease-in-out infinite;
+}
+
+@keyframes streak-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* 签到面板遮罩 */
+.checkin-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 签到面板 */
+.checkin-panel {
+  background: var(--bg-card);
+  border: 2px solid var(--border-dark);
+  border-radius: 8px;
+  width: 340px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: panel-appear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.checkin-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--gold), var(--secondary));
+}
+
+@keyframes panel-appear {
+  from {
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-dark);
+  background: linear-gradient(180deg, rgba(245, 197, 24, 0.05) 0%, transparent 100%);
+}
+
+.panel-header h3 {
+  color: var(--gold);
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px var(--gold);
+}
+
+.close-btn {
+  background: transparent;
+  border: 1px solid var(--border-dark);
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  color: var(--hp-red);
+  border-color: var(--hp-red);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* 签到状态 */
+.panel-status {
+  padding: 20px 22px;
+  text-align: center;
+}
+
+.status-checked, .status-unchecked {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 15px;
+  padding: 14px;
+  border-radius: 6px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+}
+
+.status-checked {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.status-icon {
+  font-size: 22px;
+}
+
+.streak-count {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #000;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+/* 签到结果 */
+.checkin-result {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.05) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  margin: 0 22px 18px;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  animation: result-appear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.checkin-result::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.2) 0%, transparent 70%);
+  animation: result-glow 2s ease-in-out infinite;
+}
+
+@keyframes result-appear {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes result-glow {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+.result-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  animation: result-icon-bounce 0.6s ease-out;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes result-icon-bounce {
+  0% { transform: scale(0) rotate(-180deg); }
+  50% { transform: scale(1.2) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.result-msg {
+  color: #22c55e;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+}
+
+.result-rewards {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  font-size: 14px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 12px;
+}
+
+.reward-exp, .reward-gold {
+  padding: 8px 16px;
+  background: var(--bg-dark);
+  border-radius: 6px;
+  border: 1px solid var(--border-dark);
+  font-weight: 700;
+  animation: reward-pop 0.4s ease-out backwards;
+}
+
+.reward-exp {
+  color: var(--exp-green);
+  border-color: rgba(74, 222, 128, 0.3);
+  animation-delay: 0.2s;
+}
+
+.reward-gold {
+  color: var(--gold);
+  border-color: rgba(245, 197, 24, 0.3);
+  animation-delay: 0.3s;
+}
+
+@keyframes reward-pop {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.result-streak {
+  font-size: 12px;
+  color: var(--text-secondary);
+  position: relative;
+  z-index: 1;
+  padding: 6px 12px;
+  background: var(--bg-darkest);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+/* 签到按钮 */
+.checkin-btn {
+  display: block;
+  width: calc(100% - 44px);
+  margin: 0 auto 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.checkin-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.checkin-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 8px 25px rgba(99, 102, 241, 0.4),
+    0 0 40px var(--primary-glow);
+}
+
+.checkin-btn:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.checkin-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 
+    0 4px 15px rgba(99, 102, 241, 0.3),
+    0 0 20px var(--primary-glow);
+}
+
+.checkin-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #4b5563, #6b7280);
+  border-color: #4b5563;
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-icon {
+  font-size: 20px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.btn-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 奖励预览 */
+.reward-preview {
+  padding: 0 22px 18px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.reward-preview-header {
+  text-align: center;
+  font-size: 12px;
+  color: var(--gold);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.reward-preview-items {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.reward-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--bg-dark);
+  border-radius: 6px;
+  border: 1px solid var(--border-dark);
+  transition: all 0.2s;
+}
+
+.reward-item:hover {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 197, 24, 0.2);
+}
+
+.reward-icon {
+  font-size: 16px;
+}
+
+.reward-value {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.reward-bonus {
+  text-align: center;
+  font-size: 11px;
+  color: var(--exp-green);
+  padding: 6px 12px;
+  background: rgba(34, 197, 94, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  font-weight: 600;
+}
+
+/* 迷你日历 */
+.mini-calendar {
+  padding: 16px 22px 20px;
+  border-top: 1px solid var(--border-dark);
+  background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-card) 100%);
+}
+
+.mini-calendar .calendar-header {
+  text-align: center;
+  font-size: 14px;
+  color: var(--gold);
+  margin-bottom: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.mini-calendar .calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.mini-calendar .calendar-weekdays span {
+  text-align: center;
+  font-size: 10px;
+  color: var(--text-secondary);
+  padding: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.mini-calendar .calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.mini-calendar .day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 11px;
+  position: relative;
+  background: var(--bg-darkest);
+  border: 1px solid var(--border-dark);
+  transition: all 0.2s;
+}
+
+.mini-calendar .day:hover:not(.empty) {
+  border-color: var(--primary);
+  transform: scale(1.05);
+}
+
+.mini-calendar .day.empty {
+  background: transparent;
+  border: none;
+}
+
+.mini-calendar .day.today {
+  border-color: var(--gold);
+  box-shadow: 0 0 10px var(--gold);
+  background: rgba(245, 197, 24, 0.1);
+}
+
+.mini-calendar .day.checked {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
+}
+
+.mini-calendar .day-num {
+  font-size: 11px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.mini-calendar .day-check {
+  font-size: 8px;
+  color: #22c55e;
+  font-weight: bold;
+  position: absolute;
+  bottom: 2px;
+  text-shadow: 0 0 4px rgba(34, 197, 94, 0.5);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

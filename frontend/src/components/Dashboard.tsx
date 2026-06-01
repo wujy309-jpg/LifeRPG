@@ -4,6 +4,7 @@ import type { CharacterFull, GameFeedback } from '../services/api';
 import RadarChart from './RadarChart';
 import LevelUpEffect from './LevelUpEffect';
 import StatChangeEffect from './StatChangeEffect';
+import DailyCheckIn from './DailyCheckIn';
 import { GameIcon, ICONS, STAT_COLORS } from './GameIcons';
 import PixelCharacter from './PixelCharacter';
 import './Dashboard.css';
@@ -26,6 +27,11 @@ function Dashboard({ data, onRefresh }: DashboardProps) {
   const { character, equipment, titles, active_quests, recent_activities, next_level_exp, level_title } = data;
 
   const expPercentage = (character.exp / next_level_exp) * 100;
+  
+  // 计算总属性(平均值，范围0-100)
+  const totalScore = Math.round(
+    (character.strength + character.intelligence + character.agility + character.charisma + character.willpower) / 5
+  );
 
   const handleStatChangeComplete = useCallback(() => {
     setShowStatChange(false);
@@ -122,7 +128,7 @@ function Dashboard({ data, onRefresh }: DashboardProps) {
       <div className="character-overview">
         <div className="avatar-section">
           <div className="pixel-avatar-wrapper">
-            <PixelCharacter size={72} animate={true} />
+            <PixelCharacter size={72} animate={true} score={totalScore} />
           </div>
           <div className="character-title">
             <h3>{character.name}</h3>
@@ -136,6 +142,9 @@ function Dashboard({ data, onRefresh }: DashboardProps) {
           <span className="exp-text">EXP: {character.exp} / {next_level_exp}</span>
         </div>
       </div>
+
+      {/* 每日签到 */}
+      <DailyCheckIn characterId={character.id} onCheckIn={onRefresh} />
 
       {/* 属性雷达图 */}
       <div className="radar-section">

@@ -7,6 +7,24 @@ interface CharacterSheetProps {
   data: CharacterFull;
 }
 
+// 根据总属性获取边框颜色
+function getAvatarFrameStyle(score: number) {
+  if (score >= 90) {
+    return { borderColor: '#ef4444', glowColor: 'rgba(239,68,68,0.6)', className: 'frame-red' };
+  } else if (score >= 80) {
+    return { borderColor: '#f59e0b', glowColor: 'rgba(245,158,11,0.5)', className: 'frame-gold' };
+  } else if (score >= 70) {
+    return { borderColor: '#a855f7', glowColor: 'rgba(168,85,247,0.4)', className: 'frame-purple' };
+  } else if (score >= 60) {
+    return { borderColor: '#3b82f6', glowColor: 'rgba(59,130,246,0.4)', className: 'frame-blue' };
+  } else if (score >= 50) {
+    return { borderColor: '#22c55e', glowColor: 'rgba(34,197,94,0.3)', className: 'frame-green' };
+  } else if (score >= 40) {
+    return { borderColor: '#ffffff', glowColor: 'rgba(255,255,255,0.3)', className: 'frame-white' };
+  }
+  return { borderColor: 'var(--border-dark)', glowColor: 'transparent', className: '' };
+}
+
 function CharacterSheet({ data }: CharacterSheetProps) {
   const { character, level_title, next_level_exp, titles } = data;
 
@@ -29,8 +47,9 @@ function CharacterSheet({ data }: CharacterSheetProps) {
     return <span className="stat-icon" style={{ color }}>{iconMap[iconName] || null}</span>;
   };
 
-  const totalStats = stats.reduce((sum, s) => sum + s.value, 0);
+  const totalStats = Math.round(stats.reduce((sum, s) => sum + s.value, 0) / 5);
   const maxStat = Math.max(...stats.map(s => s.value));
+  const frameStyle = getAvatarFrameStyle(totalStats);
 
   const expPercentage = (character.exp / next_level_exp) * 100;
 
@@ -43,7 +62,13 @@ function CharacterSheet({ data }: CharacterSheetProps) {
       {/* 角色信息卡 */}
       <div className="character-card">
         <div className="card-left">
-          <div className="large-avatar">
+          <div 
+            className={`large-avatar ${frameStyle.className}`}
+            style={{
+              borderColor: frameStyle.borderColor,
+              boxShadow: `0 0 15px ${frameStyle.glowColor}, 0 0 30px ${frameStyle.glowColor}`
+            }}
+          >
             {character.name.charAt(0)}
           </div>
           <div className="name-section">

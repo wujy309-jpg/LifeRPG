@@ -95,7 +95,7 @@ export default function CharacterManager({
   };
 
   const getCharacterStats = (char: Character) => {
-    return char.strength + char.intelligence + char.agility + char.charisma + char.willpower;
+    return Math.round((char.strength + char.intelligence + char.agility + char.charisma + char.willpower) / 5);
   };
 
   return (

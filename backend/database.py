@@ -1,7 +1,7 @@
 import sqlite3
 from contextlib import contextmanager
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 DB_PATH = "liferpg.db"
 
@@ -97,6 +97,30 @@ def init_db():
                 gold_reward INTEGER DEFAULT 0,
                 status TEXT DEFAULT 'active',
                 due_date DATE,
+                completed_at TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (character_id) REFERENCES characters(id)
+            );
+            
+            CREATE TABLE IF NOT EXISTS check_ins (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                character_id INTEGER NOT NULL,
+                check_in_date DATE NOT NULL,
+                consecutive_days INTEGER DEFAULT 1,
+                reward_exp INTEGER DEFAULT 0,
+                reward_gold INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (character_id) REFERENCES characters(id),
+                UNIQUE(character_id, check_in_date)
+            );
+            
+            CREATE TABLE IF NOT EXISTS activity_templates (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                character_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                description TEXT NOT NULL,
+                activity_type TEXT,
+                use_count INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (character_id) REFERENCES characters(id)
             );
@@ -113,6 +137,7 @@ def init_db():
             ("equipment", "use_desc", "TEXT DEFAULT '使用物品'"),
             ("equipment", "use_effect", "TEXT DEFAULT '感觉不错'"),
             ("equipment", "use_bonus", "TEXT DEFAULT '{}'"),
+            ("quests", "completed_at", "TIMESTAMP"),
         ]
         
         for table, column, col_type in new_columns:
@@ -123,126 +148,141 @@ def init_db():
 
 
 def calculate_initial_stats(gender: str, age: int, height: float, weight: float, education: str, occupation: str) -> dict:
-    """根据个人信息计算初始属性"""
-    # 基础属性
-    strength = 10
-    intelligence = 10
-    agility = 10
-    charisma = 10
-    willpower = 10
+    """
+    根据个人信息计算初始属性
     
-    # 性别影响（轻微）
+    规则：
+    - 每个属性初始值 = 50
+    - 根据个人信息加分（可正可负）
+    - 每个属性上限 100，下限 1
+    - 总属性 = 五个属性平均值，范围 0-100
+    """
+    # 基础属性全部为 50
+    strength = 50
+    intelligence = 50
+    agility = 50
+    charisma = 50
+    willpower = 50
+    
+    # ========== 性别影响 ==========
     if gender == "男":
-        strength += 2
-        agility += 1
+        strength += 5      # 男性力量稍高
+        agility += 3       # 敏捷稍高
+        charisma -= 2      # 魅力稍低
     elif gender == "女":
-        charisma += 2
-        agility += 1
+        charisma += 5      # 女性魅力稍高
+        agility += 3       # 敏捷稍高
+        strength -= 2      # 力量稍低
     
-    # 年龄影响
+    # ========== 年龄影响 ==========
     if age > 0:
         if age < 18:
-            # 年轻：敏捷高，力量低
-            agility += 3
-            strength -= 2
-            intelligence += 1
+            # 青少年：敏捷高，力量和意志低
+            agility += 8
+            intelligence += 5
+            strength -= 8
+            willpower -= 8
         elif age < 25:
             # 青年：平衡发展
-            agility += 2
-            strength += 1
-            intelligence += 1
+            agility += 5
+            strength += 3
+            intelligence += 3
+            charisma += 3
         elif age < 35:
             # 壮年：力量和智力高
-            strength += 2
-            intelligence += 2
-            willpower += 1
+            strength += 5
+            intelligence += 5
+            willpower += 5
         elif age < 50:
             # 中年：智力和意志高
-            intelligence += 3
-            willpower += 2
-            agility -= 1
+            intelligence += 8
+            willpower += 8
+            charisma += 3
+            agility -= 5
+            strength -= 5
         else:
-            # 老年：意志高，敏捷低
-            willpower += 4
-            intelligence += 2
-            agility -= 2
-            strength -= 2
+            # 老年：意志最高
+            willpower += 12
+            intelligence += 5
+            charisma += 3
+            agility -= 10
+            strength -= 10
     
-    # 身高体重影响（BMI相关）
+    # ========== 身高体重影响（BMI） ==========
     if height > 0 and weight > 0:
         height_m = height / 100
         bmi = weight / (height_m * height_m)
         
         if bmi < 18.5:
             # 偏瘦：敏捷高，力量低
-            agility += 2
-            strength -= 1
+            agility += 5
+            strength -= 3
         elif bmi < 25:
             # 正常：平衡
-            strength += 1
-            agility += 1
+            strength += 3
+            agility += 3
         elif bmi < 30:
             # 偏胖：力量高，敏捷低
-            strength += 2
-            agility -= 1
+            strength += 5
+            agility -= 5
         else:
-            # 肥胖：力量高，敏捷低
-            strength += 1
-            agility -= 2
+            # 肥胖：力量高，敏捷和魅力低
+            strength += 3
+            agility -= 8
+            charisma -= 5
         
         # 身高优势
-        if height > 175:
-            strength += 1
-            agility += 1
-        elif height > 185:
-            strength += 2
-            charisma += 1
+        if height > 185:
+            strength += 5
+            charisma += 3
+        elif height > 175:
+            strength += 3
     
-    # 学历影响
+    # ========== 学历影响 ==========
     education_bonus = {
-        "小学": {"intelligence": 1},
-        "初中": {"intelligence": 2},
-        "高中": {"intelligence": 3, "willpower": 1},
-        "大专": {"intelligence": 4, "willpower": 2},
-        "本科": {"intelligence": 5, "willpower": 2, "charisma": 1},
-        "硕士": {"intelligence": 7, "willpower": 3, "charisma": 2},
-        "博士": {"intelligence": 9, "willpower": 4, "charisma": 2},
-        "其他": {"intelligence": 1}
+        "小学":   {"intelligence": -5, "willpower": -3},
+        "初中":   {"intelligence": -2, "willpower": 0},
+        "高中":   {"intelligence": 2, "willpower": 2},
+        "大专":   {"intelligence": 5, "willpower": 3, "charisma": 2},
+        "本科":   {"intelligence": 8, "willpower": 5, "charisma": 3},
+        "硕士":   {"intelligence": 12, "willpower": 8, "charisma": 5},
+        "博士":   {"intelligence": 18, "willpower": 12, "charisma": 5},
+        "其他":   {"intelligence": 0, "willpower": 0}
     }
     
     if education in education_bonus:
         for attr, bonus in education_bonus[education].items():
             locals()[attr] += bonus
     
-    # 职业影响
+    # ========== 职业影响 ==========
     occupation_bonuses = {
-        "学生": {"intelligence": 3, "agility": 1},
-        "程序员": {"intelligence": 4, "willpower": 2},
-        "设计师": {"intelligence": 3, "charisma": 2, "agility": 1},
-        "教师": {"intelligence": 3, "charisma": 3},
-        "医生": {"intelligence": 5, "willpower": 3},
-        "律师": {"intelligence": 4, "charisma": 3},
-        "销售": {"charisma": 4, "willpower": 2},
-        "工人": {"strength": 4, "willpower": 2},
-        "运动员": {"strength": 5, "agility": 4},
-        "艺术家": {"intelligence": 3, "charisma": 3, "agility": 1},
-        "自由职业": {"willpower": 3, "charisma": 2},
-        "企业管理": {"charisma": 4, "intelligence": 2, "willpower": 2},
-        "公务员": {"willpower": 3, "charisma": 2},
-        "服务业": {"charisma": 3, "agility": 2},
-        "其他": {"willpower": 1}
+        "学生":     {"intelligence": 5, "agility": 5, "charisma": 3},
+        "程序员":   {"intelligence": 10, "willpower": 8, "agility": 3},
+        "设计师":   {"intelligence": 8, "charisma": 8, "agility": 5},
+        "教师":     {"intelligence": 8, "charisma": 8, "willpower": 5},
+        "医生":     {"intelligence": 12, "willpower": 10, "charisma": 5},
+        "律师":     {"intelligence": 10, "charisma": 10, "willpower": 5},
+        "销售":     {"charisma": 12, "willpower": 8, "agility": 3},
+        "工人":     {"strength": 10, "willpower": 8, "agility": 3},
+        "运动员":   {"strength": 12, "agility": 12, "willpower": 8},
+        "艺术家":   {"intelligence": 8, "charisma": 8, "agility": 5},
+        "自由职业": {"willpower": 10, "charisma": 5, "agility": 5},
+        "企业管理": {"charisma": 10, "intelligence": 8, "willpower": 8},
+        "公务员":   {"willpower": 10, "charisma": 5, "intelligence": 5},
+        "服务业":   {"charisma": 8, "agility": 5, "willpower": 3},
+        "其他":     {"willpower": 3, "charisma": 3}
     }
     
     if occupation in occupation_bonuses:
         for attr, bonus in occupation_bonuses[occupation].items():
             locals()[attr] += bonus
     
-    # 确保属性在合理范围内
-    strength = max(5, min(20, strength))
-    intelligence = max(5, min(20, intelligence))
-    agility = max(5, min(20, agility))
-    charisma = max(5, min(20, charisma))
-    willpower = max(5, min(20, willpower))
+    # ========== 确保属性在合理范围内（1-100） ==========
+    strength = max(1, min(100, strength))
+    intelligence = max(1, min(100, intelligence))
+    agility = max(1, min(100, agility))
+    charisma = max(1, min(100, charisma))
+    willpower = max(1, min(100, willpower))
     
     return {
         "strength": strength,
@@ -441,11 +481,12 @@ def get_quests(character_id: int, status: str = None) -> list:
         today = datetime.now().strftime("%Y-%m-%d")
         conn.execute(
             """UPDATE quests 
-               SET status = 'active' 
+               SET status = 'active', completed_at = NULL
                WHERE character_id = ? 
                AND quest_type = 'daily' 
                AND status = 'completed' 
-               AND DATE(created_at) < ?""",
+               AND completed_at IS NOT NULL
+               AND DATE(completed_at) < ?""",
             (character_id, today)
         )
         
@@ -464,9 +505,10 @@ def get_quests(character_id: int, status: str = None) -> list:
 
 def complete_quest(quest_id: int) -> dict:
     with get_db() as conn:
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         conn.execute(
-            "UPDATE quests SET status = 'completed' WHERE id = ?",
-            (quest_id,)
+            "UPDATE quests SET status = 'completed', completed_at = ? WHERE id = ?",
+            (now, quest_id)
         )
         row = conn.execute(
             "SELECT * FROM quests WHERE id = ?",
@@ -1101,3 +1143,161 @@ def get_penalty_history(character_id: int) -> list:
             (character_id,)
         ).fetchall()
         return [dict(h) for h in history]
+
+
+# ============ 签到系统 ============
+
+def check_in(character_id: int) -> dict:
+    """
+    每日签到
+    
+    规则：
+    - 每天只能签到一次
+    - 连续签到奖励递增
+    - 基础奖励：10经验 + 5金币
+    - 每连续一天：+5经验 + 3金币
+    - 最高连续30天封顶
+    """
+    today = date.today().isoformat()
+    
+    with get_db() as conn:
+        # 检查今天是否已签到
+        existing = conn.execute(
+            "SELECT * FROM check_ins WHERE character_id = ? AND check_in_date = ?",
+            (character_id, today)
+        ).fetchone()
+        
+        if existing:
+            return {"success": False, "message": "今天已经签到过了！"}
+        
+        # 获取昨天的签到记录
+        yesterday = (date.today() - timedelta(days=1)).isoformat()
+        last_checkin = conn.execute(
+            "SELECT * FROM check_ins WHERE character_id = ? AND check_in_date = ?",
+            (character_id, yesterday)
+        ).fetchone()
+        
+        # 计算连续天数
+        consecutive_days = 1
+        if last_checkin:
+            consecutive_days = last_checkin["consecutive_days"] + 1
+        
+        # 限制最大连续天数
+        consecutive_days = min(consecutive_days, 30)
+        
+        # 计算奖励
+        base_exp = 10
+        base_gold = 5
+        reward_exp = base_exp + (consecutive_days - 1) * 5
+        reward_gold = base_gold + (consecutive_days - 1) * 3
+        
+        # 记录签到
+        conn.execute(
+            "INSERT INTO check_ins (character_id, check_in_date, consecutive_days, reward_exp, reward_gold) VALUES (?, ?, ?, ?, ?)",
+            (character_id, today, consecutive_days, reward_exp, reward_gold)
+        )
+        
+        # 给角色加奖励
+        character = conn.execute("SELECT * FROM characters WHERE id = ?", (character_id,)).fetchone()
+        if character:
+            new_exp = character["exp"] + reward_exp
+            new_gold = character["gold"] + reward_gold
+            
+            # 检查升级
+            from game_engine import check_level_up
+            new_level, remaining_exp = check_level_up(new_exp, character["level"])
+            
+            conn.execute(
+                "UPDATE characters SET exp = ?, gold = ?, level = ? WHERE id = ?",
+                (remaining_exp, new_gold, new_level, character_id)
+            )
+        
+        return {
+            "success": True,
+            "message": f"签到成功！连续签到{consecutive_days}天",
+            "consecutive_days": consecutive_days,
+            "reward_exp": reward_exp,
+            "reward_gold": reward_gold
+        }
+
+
+def get_check_in_status(character_id: int) -> dict:
+    """获取签到状态"""
+    today = date.today().isoformat()
+    
+    with get_db() as conn:
+        # 检查今天是否已签到
+        today_checkin = conn.execute(
+            "SELECT * FROM check_ins WHERE character_id = ? AND check_in_date = ?",
+            (character_id, today)
+        ).fetchone()
+        
+        # 获取连续签到天数
+        consecutive_days = 0
+        if today_checkin:
+            consecutive_days = today_checkin["consecutive_days"]
+        else:
+            # 检查昨天的记录
+            yesterday = (date.today() - timedelta(days=1)).isoformat()
+            yesterday_checkin = conn.execute(
+                "SELECT * FROM check_ins WHERE character_id = ? AND check_in_date = ?",
+                (character_id, yesterday)
+            ).fetchone()
+            if yesterday_checkin:
+                consecutive_days = yesterday_checkin["consecutive_days"]
+        
+        # 获取本月签到记录
+        month_start = date.today().replace(day=1).isoformat()
+        month_checkins = conn.execute(
+            "SELECT check_in_date FROM check_ins WHERE character_id = ? AND check_in_date >= ?",
+            (character_id, month_start)
+        ).fetchall()
+        
+        return {
+            "checked_in_today": today_checkin is not None,
+            "consecutive_days": consecutive_days,
+            "month_checkins": [r["check_in_date"] for r in month_checkins]
+        }
+
+
+# ============ 活动模板 ============
+
+def get_activity_templates(character_id: int) -> list:
+    """获取活动模板列表"""
+    with get_db() as conn:
+        templates = conn.execute(
+            "SELECT * FROM activity_templates WHERE character_id = ? ORDER BY use_count DESC",
+            (character_id,)
+        ).fetchall()
+        return [dict(t) for t in templates]
+
+
+def add_activity_template(character_id: int, name: str, description: str, activity_type: str = None) -> dict:
+    """添加活动模板"""
+    with get_db() as conn:
+        cursor = conn.execute(
+            "INSERT INTO activity_templates (character_id, name, description, activity_type) VALUES (?, ?, ?, ?)",
+            (character_id, name, description, activity_type)
+        )
+        return {"id": cursor.lastrowid, "name": name, "description": description}
+
+
+def delete_activity_template(template_id: int) -> bool:
+    """删除活动模板"""
+    with get_db() as conn:
+        conn.execute("DELETE FROM activity_templates WHERE id = ?", (template_id,))
+        return True
+
+
+def use_activity_template(template_id: int) -> dict:
+    """使用活动模板（增加使用次数）"""
+    with get_db() as conn:
+        conn.execute(
+            "UPDATE activity_templates SET use_count = use_count + 1 WHERE id = ?",
+            (template_id,)
+        )
+        template = conn.execute(
+            "SELECT * FROM activity_templates WHERE id = ?",
+            (template_id,)
+        ).fetchone()
+        return dict(template) if template else None

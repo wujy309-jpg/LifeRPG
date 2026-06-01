@@ -378,4 +378,55 @@ export const getPenaltyHistory = async (characterId: number): Promise<any> => {
   return res.data;
 };
 
+// ============ 签到相关API ============
+
+export const checkIn = async (characterId: number): Promise<any> => {
+  const res = await api.post(`/checkin/${characterId}`);
+  return res.data;
+};
+
+export const getCheckInStatus = async (characterId: number): Promise<any> => {
+  const res = await api.get(`/checkin/status/${characterId}`);
+  return res.data;
+};
+
+// ============ 活动模板相关API ============
+
+export interface ActivityTemplate {
+  id: number;
+  character_id: number;
+  name: string;
+  description: string;
+  activity_type: string | null;
+  use_count: number;
+  created_at: string;
+}
+
+export const getTemplates = async (characterId: number): Promise<ActivityTemplate[]> => {
+  const res = await api.get(`/templates/${characterId}`);
+  return res.data;
+};
+
+export const addTemplate = async (characterId: number, name: string, description: string, activityType?: string): Promise<any> => {
+  const res = await api.post(`/templates/${characterId}`, { name, description, activity_type: activityType });
+  return res.data;
+};
+
+export const deleteTemplate = async (templateId: number): Promise<any> => {
+  const res = await api.delete(`/templates/${templateId}`);
+  return res.data;
+};
+
+export const useTemplate = async (templateId: number): Promise<any> => {
+  const res = await api.post(`/templates/use/${templateId}`);
+  return res.data;
+};
+
+// ============ 数据导出 API ============
+
+export const exportData = async (characterId: number, format: 'json' | 'csv' = 'json'): Promise<any> => {
+  const res = await api.get(`/export/${characterId}?format=${format}`);
+  return res.data;
+};
+
 export default api;

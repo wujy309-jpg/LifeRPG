@@ -70,6 +70,7 @@ class QuestResponse(BaseModel):
     gold_reward: int
     status: str
     due_date: Optional[str]
+    completed_at: Optional[str] = None
     created_at: Optional[str]
 
 

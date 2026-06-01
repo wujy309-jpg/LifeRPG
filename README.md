@@ -2,8 +2,6 @@
 
 把你的日常生活变成一场RPG冒险！记录活动获得经验值、金币、装备和称号。
 
-![image-20260530183710149](C:\Users\萨布拉\AppData\Roaming\Typora\typora-user-images\image-20260530183710149.png)
-
 ## 功能特色
 
 ### 核心系统
@@ -184,17 +182,25 @@ LifeRPG/
 ├── frontend/
 │   ├── src/
 │   │   ├── App.tsx
+│   │   ├── Stats.tsx              # 数据统计页
 │   │   ├── components/
 │   │   │   ├── Dashboard.tsx        # 仪表盘
 │   │   │   ├── ActivityLog.tsx      # 活动记录
+│   │   │   ├── ActivityTemplates.tsx # 活动模板
 │   │   │   ├── CharacterSheet.tsx   # 角色属性
 │   │   │   ├── Inventory.tsx        # 装备背包
 │   │   │   ├── QuestBoard.tsx       # 任务板
 │   │   │   ├── CharacterManager.tsx # 角色管理
 │   │   │   ├── AISettings.tsx       # AI设置
 │   │   │   ├── RealityShop.tsx      # 现实商城
+│   │   │   ├── DailyCheckIn.tsx     # 每日签到
+│   │   │   ├── DataExport.tsx       # 数据导出
 │   │   │   ├── GameIcons.tsx        # RPG图标
-│   │   │   └── RadarChart.tsx       # 雷达图
+│   │   │   ├── PixelCharacter.tsx   # 像素角色
+│   │   │   ├── RadarChart.tsx       # 雷达图
+│   │   │   ├── Calendar.tsx         # 日历
+│   │   │   ├── ThemeSwitcher.tsx    # 主题切换
+│   │   │   └── TimeDisplay.tsx      # 时间显示
 │   │   └── services/api.ts
 │   └── package.json
 ├── install.bat
@@ -354,6 +360,17 @@ MIT License
 欢迎提交Issue和Pull Request！
 
 ## 更新日志
+
+### v1.6.0 (2026-06-01)
+- 新增每日签到系统（连续签到递增奖励）
+- 新增活动模板功能（保存常用活动快速记录）
+- 新增数据统计页面（活动历史、属性变化图表）
+- 新增数据导出功能（JSON/CSV格式）
+- 新增日历组件（显示签到和活动记录）
+- 新增主题切换功能
+- 修复任务完成按钮点击无效的BUG（每日任务刷新逻辑错误）
+- 优化角色属性展示（新增进度条和等级标识）
+- 优化像素角色动画
 
 ### v1.5.0 (2026-05-30)
 - 新增现实商城系统

@@ -152,7 +152,17 @@ function App() {
           </div>
           <div className="character-mini">
             <div className="mini-avatar">
-              <PixelCharacter size={48} animate={true} />
+              <PixelCharacter 
+                size={48} 
+                animate={true} 
+                score={Math.round(
+                  (characterData.character.strength + 
+                   characterData.character.intelligence + 
+                   characterData.character.agility + 
+                   characterData.character.charisma + 
+                   characterData.character.willpower) / 5
+                )}
+              />
             </div>
             <div className="mini-info">
               <span className="mini-name">{characterData.character.name}</span>
@@ -175,7 +185,7 @@ function App() {
             <Route path="/inventory" element={<Inventory characterId={characterId} />} />
             <Route path="/quests" element={<QuestBoard characterId={characterId} onQuestComplete={handleRefresh} />} />
             <Route path="/reality" element={<RealityShop characterId={characterId} onRefresh={handleRefresh} />} />
-            <Route path="/stats" element={<Stats characterId={characterId} />} />
+            <Route path="/stats" element={<Stats characterId={characterId} characterName={characterData.character.name} />} />
           </Routes>
         </main>
       </div>
