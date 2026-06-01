@@ -1078,6 +1078,287 @@ async def api_get_penalty_history(character_id: int):
     return {"history": history}
 
 
+# ==================== 智能体 API ====================
+
+from agent import get_agent
+from agent_database import init_agent_tables
+
+
+@app.on_event("startup")
+async def startup_event():
+    """启动时初始化智能体表"""
+    init_agent_tables()
+    
+    # 启动智能体调度器
+    from agent_scheduler import start_scheduler, setup_all_characters_schedule
+    start_scheduler()
+    setup_all_characters_schedule()
+    
+    print("智能体系统初始化完成")
+
+
+@app.post("/api/agent/chat/{character_id}")
+async def api_agent_chat(character_id: int, data: dict):
+    """智能体对话"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    
+    message = data.get("message", "")
+    session_id = data.get("session_id")
+    
+    if not message:
+        raise HTTPException(status_code=400, detail="消息不能为空")
+    
+    agent = get_agent()
+    
+    # 如果没有session_id，开始新对话
+    if not session_id:
+        session_id = agent.start_conversation(character_id)
+    
+    # 处理消息
+    result = agent.process_message(character_id, session_id, message)
+    
+    return result
+
+
+@app.get("/api/agent/sessions/{character_id}")
+async def api_get_agent_sessions(character_id: int):
+    """获取对话会话列表"""
+    from agent_database import get_conversation_history
+    history = get_conversation_history(character_id, limit=100)
+    
+    # 按session_id分组
+    sessions = {}
+    for record in history:
+        session_id = record.get("session_id")
+        if session_id not in sessions:
+            sessions[session_id] = {
+                "session_id": session_id,
+                "messages": [],
+                "last_activity": record.get("created_at")
+            }
+        sessions[session_id]["messages"].append(record)
+    
+    return {"sessions": list(sessions.values())}
+
+
+@app.get("/api/agent/memory/{character_id}")
+async def api_get_agent_memory(character_id: int, memory_type: str = None):
+    """获取智能体记忆"""
+    agent = get_agent()
+    
+    # 获取行为记忆
+    from agent_database import get_behavior_memories
+    memories = get_behavior_memories(character_id, memory_type=memory_type)
+    
+    # 获取行为模式分析
+    patterns = agent.analyze_behavior_patterns(character_id)
+    
+    return {
+        "memories": memories,
+        "patterns": patterns.get("patterns", []),
+        "insights": patterns.get("insights", [])
+    }
+
+
+@app.get("/api/agent/emotion/{character_id}")
+async def api_get_emotion_status(character_id: int):
+    """获取情绪状态"""
+    from agent_database import get_recent_emotions, get_emotion_stats
+    
+    recent = get_recent_emotions(character_id, hours=24)
+    stats = get_emotion_stats(character_id, days=7)
+    
+    return {
+        "recent_emotions": recent,
+        "emotion_stats": stats
+    }
+
+
+@app.get("/api/agent/notifications/{character_id}")
+async def api_get_notifications(character_id: int, unread_only: bool = True):
+    """获取通知"""
+    agent = get_agent()
+    
+    # 检查并发送新通知
+    agent.check_and_send_notifications(character_id)
+    
+    # 获取通知
+    notifications = agent.get_notifications(character_id, unread_only=unread_only)
+    
+    return {"notifications": notifications}
+
+
+@app.post("/api/agent/notifications/{notification_id}/read")
+async def api_mark_notification_read(notification_id: int):
+    """标记通知已读"""
+    from agent_database import mark_notification_read
+    mark_notification_read(notification_id)
+    return {"message": "已标记为已读"}
+
+
+@app.get("/api/agent/goals/{character_id}")
+async def api_get_goals(character_id: int, status: str = "active"):
+    """获取长期目标"""
+    from agent_database import get_long_term_goals
+    goals = get_long_term_goals(character_id, status=status)
+    return {"goals": goals}
+
+
+@app.post("/api/agent/goals/{character_id}")
+async def api_create_goal(character_id: int, data: dict):
+    """创建长期目标"""
+    character = get_character(character_id)
+    if not character:
+        raise HTTPException(status_code=404, detail="角色不存在")
+    
+    agent = get_agent()
+    goal = agent.create_goal(
+        character_id=character_id,
+        title=data.get("title", ""),
+        description=data.get("description", ""),
+        goal_type=data.get("goal_type", "general"),
+        target_value=data.get("target_value"),
+        unit=data.get("unit", ""),
+        deadline=data.get("deadline")
+    )
+    
+    return goal
+
+
+@app.put("/api/agent/goals/{goal_id}/progress")
+async def api_update_goal_progress(goal_id: int, data: dict):
+    """更新目标进度"""
+    agent = get_agent()
+    character_id = data.get("character_id")
+    
+    if not character_id:
+        raise HTTPException(status_code=400, detail="需要character_id")
+    
+    result = agent.update_goal(
+        character_id=character_id,
+        goal_id=goal_id,
+        progress_increment=data.get("progress", 0.1)
+    )
+    
+    return result
+
+
+@app.get("/api/agent/tasks/{character_id}")
+async def api_get_tasks(character_id: int, date: str = None):
+    """获取任务计划"""
+    from agent_database import get_task_plans
+    tasks = get_task_plans(character_id, date=date)
+    return {"tasks": tasks}
+
+
+@app.post("/api/agent/tasks/{character_id}")
+async def api_create_task(character_id: int, data: dict):
+    """创建任务计划"""
+    from agent_database import create_task_plan
+    task = create_task_plan(
+        character_id=character_id,
+        title=data.get("title", ""),
+        description=data.get("description", ""),
+        goal_id=data.get("goal_id"),
+        task_type=data.get("task_type", "daily"),
+        priority=data.get("priority", 5),
+        scheduled_date=data.get("scheduled_date"),
+        scheduled_time=data.get("scheduled_time"),
+        recurrence=data.get("recurrence")
+    )
+    return task
+
+
+@app.post("/api/agent/tasks/{task_id}/complete")
+async def api_complete_task(task_id: int):
+    """完成任务"""
+    from agent_database import complete_task_plan
+    task = complete_task_plan(task_id)
+    return task
+
+
+@app.get("/api/agent/daily-plan/{character_id}")
+async def api_get_daily_plan(character_id: int):
+    """获取每日计划"""
+    agent = get_agent()
+    plan = agent.get_daily_plan(character_id)
+    return plan
+
+
+@app.post("/api/agent/tool/{character_id}")
+async def api_call_tool(character_id: int, data: dict):
+    """调用智能体工具"""
+    agent = get_agent()
+    result = agent.call_tool(
+        character_id=character_id,
+        tool_name=data.get("tool_name", ""),
+        params=data.get("params", {})
+    )
+    return result
+
+
+@app.get("/api/agent/decision/{character_id}")
+async def api_get_decisions(character_id: int, decision_type: str = None):
+    """获取决策历史"""
+    from agent_database import get_decision_logs
+    decisions = get_decision_logs(character_id, decision_type=decision_type)
+    return {"decisions": decisions}
+
+
+@app.post("/api/agent/decision/{character_id}")
+async def api_make_decision(character_id: int, data: dict):
+    """让智能体做决策"""
+    agent = get_agent()
+    decision = agent.make_decision(
+        character_id=character_id,
+        decision_type=data.get("decision_type", "general"),
+        context=data.get("context", {})
+    )
+    return decision
+
+
+@app.get("/api/agent/profile/{character_id}")
+async def api_get_agent_profile(character_id: int):
+    """获取用户画像"""
+    from agent_database import get_or_create_user_profile
+    profile = get_or_create_user_profile(character_id)
+    return profile
+
+
+@app.put("/api/agent/profile/{character_id}")
+async def api_update_agent_profile(character_id: int, data: dict):
+    """更新用户画像"""
+    from agent_database import update_user_profile
+    profile = update_user_profile(character_id, **data)
+    return profile
+
+
+@app.get("/api/agent/config/{character_id}")
+async def api_get_agent_config(character_id: int):
+    """获取智能体配置"""
+    from agent_database import get_agent_config
+    config = get_agent_config(character_id)
+    return config
+
+
+@app.put("/api/agent/config/{character_id}")
+async def api_update_agent_config(character_id: int, data: dict):
+    """更新智能体配置"""
+    from agent_database import update_agent_config
+    config = update_agent_config(character_id, **data)
+    return config
+
+
+@app.get("/api/agent/suggestion/{character_id}")
+async def api_get_suggestion(character_id: int):
+    """获取个性化建议"""
+    agent = get_agent()
+    suggestion = agent.get_personalized_suggestion(character_id)
+    return {"suggestion": suggestion}
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

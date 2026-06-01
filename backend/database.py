@@ -145,6 +145,13 @@ def init_db():
                 conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {col_type}")
             except:
                 pass  # 列已存在，忽略错误
+    
+    # 初始化智能体表
+    try:
+        from agent_database import init_agent_tables
+        init_agent_tables()
+    except Exception as e:
+        print(f"智能体表初始化失败: {e}")
 
 
 def calculate_initial_stats(gender: str, age: int, height: float, weight: float, education: str, occupation: str) -> dict:
